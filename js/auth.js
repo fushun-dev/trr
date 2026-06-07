@@ -104,6 +104,8 @@
     window.IS_ADMIN = isAdmin;
     document.body.classList.toggle('admin-preview', isAdmin);
     document.getElementById('admin-preview-bar')?.classList.toggle('hidden', !isAdmin);
+    // Notifications bell only for a signed-in buyer (not guests, not admins).
+    document.getElementById('notif-fab')?.classList.toggle('hidden', !(profile && !isAdmin));
   }
   window.refreshAuthUI = refreshAuthUI;
 
