@@ -57,6 +57,20 @@
     return Math.round(best * 100) / 100;
   }
 
+  // Pull live shop settings from the DB and let them override config.js defaults.
+  async function loadSettings() {
+    const { data } = await sb.from('settings').select('*');
+    if (!data) return;
+    const m = {}; data.forEach((r) => (m[r.key] = r.value));
+    if (m.shop_name) cfg.SHOP_NAME = m.shop_name;
+    if (m.shop_tagline) cfg.SHOP_TAGLINE = m.shop_tagline;
+    if (m.whatsapp) cfg.WHATSAPP = m.whatsapp.replace(/[^0-9]/g, '');
+    if (m.delivery_fee) cfg.DELIVERY_FEE = Number(m.delivery_fee);
+    if (m.free_delivery_over) cfg.FREE_DELIVERY_OVER = Number(m.free_delivery_over);
+    document.querySelectorAll('[data-shop-name]').forEach((el) => (el.textContent = cfg.SHOP_NAME));
+    document.querySelectorAll('[data-shop-tagline]').forEach((el) => (el.textContent = cfg.SHOP_TAGLINE));
+  }
+
   async function loadMenu() {
     if (window.TRR_CONFIGURED && window.sb) {
       const [{ data: cats }, { data: prods }, { data: promos }] = await Promise.all([
@@ -67,6 +81,7 @@
       CATEGORIES = cats || [];
       PRODUCTS = prods || [];
       PROMOS = promos || [];
+      loadSettings();
       loadAnnouncements();
     } else {
       CATEGORIES = DEMO.categories;
@@ -386,6 +401,84 @@
   }
   window.closeSuccess = () => document.getElementById('success-modal').classList.remove('open');
 
+  // ---- customer portal (My Orders + loyalty) ------------------------------
+  const TIERS = [
+    { name: 'Bronze', min: 0 },
+    { name: 'Silver', min: 200 },
+    { name: 'Gold', min: 500 },
+    { name: 'Platinum', min: 1000 },
+  ];
+  function tierFor(points) {
+    let t = TIERS[0];
+    for (const x of TIERS) if (points >= x.min) t = x;
+    const next = TIERS.find((x) => x.min > points);
+    return { tier: t, next };
+  }
+
+  window.openAccount = async function () {
+    if (!window.TRR_CONFIGURED) return;
+    const profile = await getProfile();
+    if (!profile) { openAuth(false); return; }
+    document.getElementById('account-modal').classList.add('open');
+    const body = document.getElementById('account-body');
+    body.innerHTML = `<p class="text-center text-gray-400 py-8">Loading…</p>`;
+
+    const pts = profile.loyalty_points || 0;
+    const { tier, next } = tierFor(pts);
+    const toNext = next ? next.min - pts : 0;
+    const { data: orders } = await sb
+      .from('orders').select('*, order_items(product_name,quantity)')
+      .eq('customer_id', profile.id).order('created_at', { ascending: false }).limit(30);
+
+    const loyalty = `
+      <div class="brand-gradient text-white rounded-2xl p-5 mb-4">
+        <div class="flex items-center justify-between">
+          <div><p class="text-white/80 text-xs">Loyalty points</p><p class="text-3xl font-extrabold">${pts}</p></div>
+          <div class="text-right"><p class="text-white/80 text-xs">Tier</p><p class="text-xl font-extrabold">${tier.name}</p></div>
+        </div>
+        ${next ? `<p class="text-white/80 text-xs mt-3">${toNext} more points to ${next.name}</p>` : `<p class="text-white/80 text-xs mt-3">Top tier reached. Thank you!</p>`}
+      </div>
+      <p class="text-xs text-gray-400 mb-2">Earn 1 point per RM 1 spent when an order is completed.</p>`;
+
+    const list = (orders || []).length ? orders.map((o) => {
+      const items = (o.order_items || []).map((i) => `${i.quantity}× ${i.product_name}`).join(', ');
+      const canRate = o.status === 'completed' && !o.rating;
+      const stars = o.rating ? renderStars(o.rating) : (canRate ? rateButtons(o.id) : '');
+      return `
+        <div class="border border-purple-50 rounded-xl p-3 mb-2">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-gray-800 text-sm">${o.order_number}</span>
+            <span class="badge badge-${o.status}">${o.status}</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">${items}</p>
+          <div class="flex items-center justify-between mt-2">
+            <span class="text-sm font-extrabold brand-gradient-text">${money(o.total)}</span>
+            <span class="text-xs">${stars}</span>
+          </div>
+        </div>`;
+    }).join('') : `<p class="text-center text-gray-400 py-6">No orders yet.</p>`;
+
+    body.innerHTML = loyalty + `<h4 class="font-bold text-gray-800 mb-2">Order history</h4>` + list;
+    body.querySelectorAll('[data-rate]').forEach((b) =>
+      b.addEventListener('click', () => submitRating(+b.dataset.order, +b.dataset.rate)));
+    injectIcons(body);
+  };
+  window.closeAccount = () => document.getElementById('account-modal').classList.remove('open');
+
+  const renderStars = (n) =>
+    Array.from({ length: 5 }, (_, i) => `<span class="${i < n ? 'text-amber-400' : 'text-gray-300'}">${ICON('sparkle')}</span>`).join('');
+  const rateButtons = (orderId) =>
+    `<span class="text-gray-400 mr-1">Rate:</span>` +
+    Array.from({ length: 5 }, (_, i) =>
+      `<button class="text-gray-300 hover:text-amber-400" data-rate="${i + 1}" data-order="${orderId}">${ICON('sparkle')}</button>`).join('');
+
+  async function submitRating(orderId, rating) {
+    const { error } = await sb.rpc('rate_order', { p_order_id: orderId, p_rating: rating });
+    if (error) return showToast(error.message, 'error');
+    showToast('Thanks for rating!', 'success');
+    openAccount();
+  }
+
   // ---- init ---------------------------------------------------------------
   document.addEventListener('cart:changed', () => { renderCart(); refreshCheckoutTotals(); });
   document.addEventListener('DOMContentLoaded', () => {
@@ -404,6 +497,8 @@
     document.getElementById('checkout-form')?.addEventListener('submit', placeOrder);
     document.getElementById('for-self')?.addEventListener('change', applyForSelfToggle);
     document.getElementById('coupon-apply')?.addEventListener('click', applyCoupon);
+    document.getElementById('account-btn')?.addEventListener('click', openAccount);
+    document.getElementById('account-close')?.addEventListener('click', closeAccount);
     document.getElementById('checkout-form')?.addEventListener('change', (e) => {
       if (e.target.name === 'fulfillment') refreshCheckoutTotals();
     });

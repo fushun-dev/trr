@@ -28,15 +28,16 @@
           <p class="text-[11px] text-purple-600 font-medium">Jalan Luak · Miri</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button id="login-btn" class="btn btn-ghost text-sm"><span class="icon" data-icon="user"></span> Sign in</button>
-        <div id="user-box" class="hidden flex items-center gap-2">
-          <span class="text-sm font-semibold text-purple-700">Hi, <span id="user-name">there</span></span>
-          <a id="admin-link" href="admin/index.html" class="btn btn-ghost text-sm hidden"><span class="icon" data-icon="gear"></span> Admin</a>
-          <button id="logout-btn" class="btn btn-ghost text-sm"><span class="icon" data-icon="logout"></span></button>
+      <div class="flex items-center gap-1.5">
+        <button id="login-btn" class="btn btn-ghost text-sm"><span class="icon" data-icon="user"></span> <span class="hidden sm:inline">Sign in</span></button>
+        <div id="user-box" class="hidden flex items-center gap-1.5">
+          <span class="text-sm font-semibold text-purple-700 hidden md:inline">Hi, <span id="user-name">there</span></span>
+          <button id="account-btn" class="btn btn-ghost text-sm"><span class="icon" data-icon="user"></span> <span class="hidden sm:inline">My orders</span></button>
+          <a id="admin-link" href="admin/index.html" class="btn btn-ghost text-sm hidden"><span class="icon" data-icon="gear"></span> <span class="hidden sm:inline">Admin</span></a>
+          <button id="logout-btn" class="btn btn-ghost text-sm" aria-label="Logout"><span class="icon" data-icon="logout"></span></button>
         </div>
         <button id="open-cart" class="btn btn-primary text-sm relative">
-          <span class="icon" data-icon="cart"></span> Cart <span id="cart-count" class="ml-1 font-bold">0</span>
+          <span class="icon" data-icon="cart"></span> <span class="hidden sm:inline">Cart</span> <span id="cart-count" class="ml-0.5 font-bold">0</span>
         </button>
       </div>
     </div>
@@ -71,7 +72,7 @@
     <h2 class="text-2xl font-extrabold text-gray-800 mb-1">Our Menu</h2>
     <p class="text-gray-500 mb-5">Tap a category to filter.</p>
 
-    <div id="category-chips" class="flex gap-2 overflow-x-auto pb-3 mb-4"></div>
+    <div id="category-chips" class="flex gap-2 overflow-x-auto no-scrollbar scroll-fade pb-3 mb-4"></div>
 
     <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4">
       <p class="col-span-full text-center text-gray-400 py-10">Loading menu…</p>
@@ -260,6 +261,17 @@
         <span class="icon" data-icon="chat"></span> Send order via WhatsApp
       </a>
       <button onclick="closeSuccess()" class="btn btn-ghost w-full py-3 mt-2">Done</button>
+    </div>
+  </div>
+
+  <!-- Account / My Orders modal -->
+  <div id="account-modal" class="modal-backdrop">
+    <div class="modal p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-extrabold text-gray-800">My Account</h3>
+        <button id="account-close" class="text-gray-400 text-2xl leading-none">&times;</button>
+      </div>
+      <div id="account-body"></div>
     </div>
   </div>
 

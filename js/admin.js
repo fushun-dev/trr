@@ -97,22 +97,60 @@
           ${o.address ? `<span class="text-gray-400">Address</span><span class="text-right">${esc(o.address)}</span>` : ''}
           ${o.notes ? `<span class="text-gray-400">Notes</span><span class="text-right">${esc(o.notes)}</span>` : ''}
           ${o.coupon_code ? `<span class="text-gray-400">Coupon</span><span class="text-right">${esc(o.coupon_code)} (-${money(o.discount)})</span>` : ''}
-          <span class="text-gray-400">Payment</span><span class="text-right capitalize">${o.payment_method}</span>
+          <span class="text-gray-400">Payment</span><span class="text-right capitalize">${o.payment_method} · <span class="${o.payment_status === 'paid' ? 'text-emerald-600' : 'text-amber-600'} font-semibold">${o.payment_status || 'unpaid'}</span></span>
+          ${o.rating ? `<span class="text-gray-400">Rating</span><span class="text-right text-amber-500 font-semibold">${o.rating}/5</span>` : ''}
           <span class="text-gray-400 font-bold">Total</span><span class="text-right font-extrabold brand-gradient-text">${money(o.total)}</span>
         </div>
-        <div class="flex gap-2 mt-3">
+        <div class="flex gap-2 mt-3 flex-wrap">
           ${next ? `<button class="btn btn-primary text-sm flex-1" data-advance="${o.id}" data-next="${next}">Mark ${next}</button>` : ''}
+          ${o.payment_status !== 'paid' ? `<button class="btn btn-ghost !text-emerald-700 !bg-emerald-50 text-sm" data-paid="${o.id}">Mark paid</button>` : ''}
           ${o.status !== 'cancelled' && o.status !== 'completed' ? `<button class="btn btn-ghost !text-red-600 !bg-red-50 text-sm" data-cancel="${o.id}">Cancel</button>` : ''}
         </div>
       </div>`;
     }).join('');
     host.querySelectorAll('[data-advance]').forEach((b) => b.addEventListener('click', () => updateStatus(+b.dataset.advance, b.dataset.next)));
     host.querySelectorAll('[data-cancel]').forEach((b) => b.addEventListener('click', () => { if (confirm('Cancel this order?')) updateStatus(+b.dataset.cancel, 'cancelled'); }));
+    host.querySelectorAll('[data-paid]').forEach((b) => b.addEventListener('click', () => markPaid(+b.dataset.paid)));
+    injectIcons(host);
   }
   async function updateStatus(id, status) {
     const { error } = await sb.from('orders').update({ status }).eq('id', id);
     if (error) return showToast(error.message, 'error');
     showToast(`Order marked ${status}`, 'success'); loadOrders();
+  }
+  async function markPaid(id) {
+    const { error } = await sb.from('orders').update({ payment_status: 'paid' }).eq('id', id);
+    if (error) return showToast(error.message, 'error');
+    showToast('Marked as paid', 'success');
+    loadOrders(); if (loaded.payments) loadPayments();
+  }
+
+  // ===================== PAYMENTS ========================================
+  async function loadPayments() {
+    const { data: orders } = await sb.from('orders').select('*, order_items(product_name,quantity)').order('created_at', { ascending: false });
+    const all = orders || [];
+    const paid = all.filter((o) => o.payment_status === 'paid' && o.status !== 'cancelled').reduce((s, o) => s + Number(o.total), 0);
+    const unpaidOrders = all.filter((o) => o.payment_status !== 'paid' && o.status !== 'cancelled');
+    const unpaid = unpaidOrders.reduce((s, o) => s + Number(o.total), 0);
+    document.getElementById('pay-paid').textContent = money(paid);
+    document.getElementById('pay-unpaid').textContent = money(unpaid);
+    document.getElementById('pay-unpaid-count').textContent = unpaidOrders.length;
+    const host = document.getElementById('payments-list');
+    host.innerHTML = unpaidOrders.length ? unpaidOrders.map((o) => {
+      const items = (o.order_items || []).map((i) => `${i.quantity}× ${i.product_name}`).join(', ');
+      return `
+      <div class="card p-4 flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <p class="font-bold text-gray-800">${o.order_number} · <span class="capitalize">${o.payment_method}</span></p>
+          <p class="text-xs text-gray-500 truncate">${esc(o.customer_name)} · ${esc(items)}</p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="font-extrabold brand-gradient-text">${money(o.total)}</span>
+          <button class="btn btn-ghost !text-emerald-700 !bg-emerald-50 text-sm" data-paid="${o.id}">Mark paid</button>
+        </div>
+      </div>`;
+    }).join('') : `<p class="text-gray-400">All settled — no pending payments.</p>`;
+    host.querySelectorAll('[data-paid]').forEach((b) => b.addEventListener('click', () => markPaid(+b.dataset.paid)));
   }
 
   // ===================== MENU ============================================
@@ -390,26 +428,40 @@
         <td class="py-2.5 px-3 text-gray-500">${esc(p.phone || '—')}</td>
         <td class="py-2.5 px-3 text-right">${s.n}</td>
         <td class="py-2.5 px-3 text-right font-semibold">${money(s.spent)}</td>
-        <td class="py-2.5 px-3 text-gray-400 text-xs">${new Date(p.created_at).toLocaleDateString('en-MY')}</td>
+        <td class="py-2.5 px-3 text-right text-purple-700 font-semibold">${p.loyalty_points || 0}</td>
+        <td class="py-2.5 px-3 text-right"><button class="btn btn-ghost text-xs" data-points="${p.id}" data-cur="${p.loyalty_points || 0}">Adjust</button></td>
       </tr>`;
     }).join('');
-    document.getElementById('customer-list').innerHTML = `
-      <table class="w-full text-sm">
+    const host = document.getElementById('customer-list');
+    host.innerHTML = `
+      <div class="overflow-x-auto"><table class="w-full text-sm min-w-[520px]">
         <thead class="bg-purple-50 text-gray-500 text-xs uppercase">
           <tr><th class="py-2 px-3 text-left">Name</th><th class="py-2 px-3 text-left">Phone</th>
-          <th class="py-2 px-3 text-right">Orders</th><th class="py-2 px-3 text-right">Spent</th><th class="py-2 px-3 text-left">Joined</th></tr>
+          <th class="py-2 px-3 text-right">Orders</th><th class="py-2 px-3 text-right">Spent</th>
+          <th class="py-2 px-3 text-right">Points</th><th class="py-2 px-3 text-right">Action</th></tr>
         </thead>
-        <tbody>${rows || '<tr><td class="py-6 px-3 text-gray-400" colspan="5">No customers yet.</td></tr>'}</tbody>
-      </table>`;
+        <tbody>${rows || '<tr><td class="py-6 px-3 text-gray-400" colspan="6">No customers yet.</td></tr>'}</tbody>
+      </table></div>`;
+    host.querySelectorAll('[data-points]').forEach((b) => b.addEventListener('click', async () => {
+      const v = prompt('Set loyalty points for this customer:', b.dataset.cur);
+      if (v === null) return;
+      const n = parseInt(v, 10); if (isNaN(n) || n < 0) return showToast('Enter a valid number', 'error');
+      const { error } = await sb.from('profiles').update({ loyalty_points: n }).eq('id', b.dataset.points);
+      if (error) return showToast(error.message, 'error');
+      showToast('Points updated', 'success'); loadCustomers();
+    }));
   }
 
   // ===================== ANALYTICS =======================================
   async function loadAnalytics() {
     const [{ data: orders }, { data: items }, { count: custCount }] = await Promise.all([
-      sb.from('orders').select('total,status,created_at'),
+      sb.from('orders').select('total,status,created_at,rating'),
       sb.from('order_items').select('product_name,quantity,line_total'),
       sb.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'customer'),
     ]);
+    const rated = (orders || []).filter((o) => o.rating);
+    document.getElementById('an-rating').textContent = rated.length
+      ? (rated.reduce((s, o) => s + o.rating, 0) / rated.length).toFixed(1) + '/5' : '—';
     const valid = (orders || []).filter((o) => o.status !== 'cancelled');
     const revenue = valid.reduce((s, o) => s + Number(o.total), 0);
     document.getElementById('an-orders').textContent = (orders || []).length;
@@ -459,7 +511,7 @@
   // ===================== TABS ============================================
   const LOADERS = {
     orders: loadOrders, menu: loadMenu, categories: loadCategoriesTab, promotions: loadPromos,
-    coupons: loadCoupons, announcements: loadAnnounce, customers: loadCustomers,
+    coupons: loadCoupons, payments: loadPayments, announcements: loadAnnounce, customers: loadCustomers,
     analytics: loadAnalytics, settings: loadSettings,
   };
   function switchTab(tab) {

@@ -163,6 +163,14 @@ body {
 }
 .no-scroll { overflow: hidden; }
 
+/* clean, hidden horizontal scrollbar (still swipeable) with soft edge fades */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; }
+.no-scrollbar::-webkit-scrollbar { display: none; height: 0; }
+.scroll-fade {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+          mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+}
+
 /* --- install-as-app banner (full-width bottom bar, HSI-style) ---------- */
 .install-banner {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 55;
