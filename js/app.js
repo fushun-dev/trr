@@ -109,14 +109,24 @@
     renderProducts();
   }
 
+  let ANNOUNCE = null;
   async function loadAnnouncements() {
     const { data } = await sb.from('announcements').select('*').eq('active', true).order('created_at', { ascending: false });
-    const bar = document.getElementById('announce-bar');
-    if (!bar || !data || !data.length) return;
-    const a = data[0];
-    bar.className = 'brand-gradient text-white text-sm text-center py-2 px-4';
-    bar.innerHTML = `<span class="font-semibold">${a.title}</span>${a.body ? ' — ' + a.body : ''}`;
+    ANNOUNCE = (data && data[0]) || null;
+    renderBanner();
   }
+  // Show the admin announcement if any, otherwise the built-in default banner.
+  function renderBanner() {
+    const bar = document.getElementById('announce-bar');
+    if (!bar) return;
+    const esc = (s) => String(s || '').replace(/</g, '&lt;');
+    const title = ANNOUNCE ? esc(ANNOUNCE.title) : I18N.t('banner.default_title');
+    const body = ANNOUNCE ? esc(ANNOUNCE.body) : I18N.t('banner.default_body');
+    bar.className = 'brand-gradient text-white text-sm text-center py-2 px-4';
+    bar.innerHTML = `<span class="font-semibold">${title}</span>${body ? ' — ' + body : ''}`;
+    bar.classList.remove('hidden');
+  }
+  window.renderBanner = renderBanner;
 
   function renderCategories() {
     const host = document.getElementById('category-chips');
@@ -635,6 +645,7 @@
 
     if (window.SHOP_OPEN === undefined) window.SHOP_OPEN = true; // optimistic default
     applyShopStatus();
+    renderBanner();   // show default banner right away; loadAnnouncements refines it
     loadMenu();
     renderCart();
     renderNotifBadge();
@@ -671,7 +682,7 @@
     document.getElementById('menu-lang')?.addEventListener('click', () => { closeProfile(); I18N.toggle(); });
     document.getElementById('menu-logout')?.addEventListener('click', () => { closeProfile(); doLogout(); });
     document.addEventListener('lang:changed', () => {
-      renderCategories(); renderProducts(); renderCart(); refreshCheckoutTotals(); applyShopStatus();
+      renderCategories(); renderProducts(); renderCart(); refreshCheckoutTotals(); applyShopStatus(); renderBanner();
       if (document.getElementById('account-modal').classList.contains('open')) openAccount();
     });
     document.getElementById('checkout-form')?.addEventListener('change', (e) => {

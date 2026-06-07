@@ -74,9 +74,5 @@ create policy "promo public read" on public.promotions for select using (true);
 create policy "promo admin write" on public.promotions for all
   using (public.is_admin()) with check (public.is_admin());
 
--- =============================================================================
--- Seed: a friendly launch announcement (edit/delete in the admin dashboard)
--- =============================================================================
-insert into public.announcements (title, body, active)
-select 'Now ordering online!', 'Pickup & delivery across Miri — order ahead and skip the queue.', true
-where not exists (select 1 from public.announcements);
+-- Note: the storefront shows a built-in default banner ("Now ordering online!")
+-- when there are no active announcements, so none are seeded here.
