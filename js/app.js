@@ -569,8 +569,28 @@
   }
   window.openNotif = openNotif;
 
+  // Wipe per-user local data (cart, notifications, snapshot) — used on account
+  // switch and logout so one user never sees another's data on a shared device.
+  window.clearUserData = function () {
+    localStorage.removeItem(NOTIF_KEY);
+    localStorage.removeItem(SNAP_KEY);
+    localStorage.removeItem('trr_uid');
+    try { Cart.clear(); } catch (e) {}
+    renderNotifBadge();
+  };
+
   window.subscribeMyOrders = async function (userId) {
     if (!window.sb || !userId) return;
+    // If a different account is now signed in on this device, clear the
+    // previous user's local cart/notifications first.
+    const prevUid = localStorage.getItem('trr_uid');
+    if (prevUid && prevUid !== userId) {
+      localStorage.removeItem(NOTIF_KEY);
+      localStorage.removeItem(SNAP_KEY);
+      try { Cart.clear(); } catch (e) {}
+      renderNotifBadge();
+    }
+    localStorage.setItem('trr_uid', userId);
     // Authenticate the realtime socket so RLS lets this user receive their rows.
     try {
       const { data: { session } } = await sb.auth.getSession();

@@ -69,6 +69,7 @@
 
   window.doLogout = async function () {
     if (sb) await sb.auth.signOut();
+    if (window.clearUserData) window.clearUserData();
     showToast('Signed out', 'info');
     refreshAuthUI();
   };
