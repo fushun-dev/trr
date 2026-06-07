@@ -193,6 +193,8 @@ body {
 }
 /* lift the mobile cart button above the banner when it's shown */
 .install-banner.show ~ .cart-fab { bottom: 5.5rem; }
+/* reserve space so the persistent banner never covers page content */
+body.has-install-banner { padding-bottom: 88px; }
 
 /* iOS add-to-home-screen sheet */
 .ios-sheet-backdrop {

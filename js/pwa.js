@@ -1,12 +1,10 @@
 /**
- * Install-as-app banner (HSI-style).
- * - Android / desktop Chrome: captures `beforeinstallprompt` and shows an
- *   "Install" button that triggers the native prompt.
- * - iOS Safari: shows "Add to Home Screen" instructions (no native prompt).
- * Dismissals are remembered for ~14 days.
+ * Install-as-app banner (HSI-style) — always visible in the browser, hidden
+ * only when the app is already running as an installed app (standalone).
+ * - Android / desktop Chrome: captures `beforeinstallprompt` for the native prompt.
+ * - iOS Safari / others: shows "Add to Home Screen" instructions.
  */
 (function () {
-  const DISMISS_KEY = 'trr_install_dismissed_v2';
   let deferredPrompt = null;
 
   const isStandalone = () =>
@@ -16,22 +14,15 @@
   const isiOS = () =>
     /iphone|ipad|ipod/i.test(navigator.userAgent) && !/crios|fxios/i.test(navigator.userAgent);
 
-  function recentlyDismissed() {
-    const t = Number(localStorage.getItem(DISMISS_KEY) || 0);
-    return Date.now() - t < 14 * 24 * 60 * 60 * 1000;
-  }
-  function dismiss() {
-    localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    hide();
-  }
   function hide() {
     document.getElementById('install-banner')?.classList.remove('show');
+    document.body.classList.remove('has-install-banner');
     document.getElementById('ios-install-sheet')?.classList.remove('open');
   }
   function show() {
-    if (isStandalone() || recentlyDismissed()) return;
-    const banner = document.getElementById('install-banner');
-    if (banner) banner.classList.add('show');
+    if (isStandalone()) return; // only hidden when opened as an installed app
+    document.getElementById('install-banner')?.classList.add('show');
+    document.body.classList.add('has-install-banner');
   }
 
   // Android / desktop: native install flow
@@ -52,7 +43,6 @@
       const { outcome } = await deferredPrompt.userChoice;
       deferredPrompt = null;
       if (outcome === 'accepted') hide();
-      else dismiss();
     } else {
       // No native prompt available (iOS, or already-dismissed Chrome) — show steps.
       document.getElementById('ios-install-sheet')?.classList.add('open');
@@ -62,14 +52,13 @@
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('install-btn')?.addEventListener('click', doInstall);
     document.getElementById('footer-install')?.addEventListener('click', doInstall);
-    document.getElementById('install-dismiss')?.addEventListener('click', dismiss);
-    document.getElementById('ios-sheet-close')?.addEventListener('click', hide);
+    document.getElementById('ios-sheet-close')?.addEventListener('click', () =>
+      document.getElementById('ios-install-sheet')?.classList.remove('open'));
     document.getElementById('ios-install-sheet')?.addEventListener('click', (e) => {
-      if (e.target.id === 'ios-install-sheet') hide();
+      if (e.target.id === 'ios-install-sheet') e.currentTarget.classList.remove('open');
     });
 
-    // Show the banner whenever the app isn't installed (HSI-style). On Android/
-    // desktop Chrome the native prompt may also arrive and wire up the button.
-    if (!isStandalone() && !recentlyDismissed()) setTimeout(show, 1200);
+    // Always show the banner in a normal browser; only hidden when installed.
+    show();
   });
 })();
