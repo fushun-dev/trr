@@ -105,12 +105,12 @@ body {
 .badge-cancelled  { background: #e5e7eb; color: #6b7280; }
 
 /* order status grouping: colored left accent on cards + urgency pulse */
-.ord-pending    { border-left: 4px solid #ef4444; }
-.ord-confirmed  { border-left: 4px solid #3b82f6; }
-.ord-preparing  { border-left: 4px solid #8b5cf6; }
-.ord-ready      { border-left: 4px solid #10b981; }
-.ord-completed  { border-left: 4px solid #9ca3af; }
-.ord-cancelled  { border-left: 4px solid #d1d5db; }
+.ord-pending    { border: 2px solid #ef4444; }
+.ord-confirmed  { border: 2px solid #3b82f6; }
+.ord-preparing  { border: 2px solid #8b5cf6; }
+.ord-ready      { border: 2px solid #10b981; }
+.ord-completed  { border: 2px solid #9ca3af; }
+.ord-cancelled  { border: 2px solid #d1d5db; }
 @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
 .dot-pulse { animation: pulse-dot 1.2s ease-in-out infinite; }
 

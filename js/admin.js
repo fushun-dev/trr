@@ -32,6 +32,19 @@
     loadShopStatus();
     loadOrders();
     loaded.orders = true;
+    subscribeRealtime();
+  }
+
+  // Live updates: refresh the orders/payments views when any order changes.
+  function subscribeRealtime() {
+    if (window._trrRealtime) return;
+    window._trrRealtime = sb.channel('orders-rt')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+        const active = document.querySelector('[data-tab].active')?.dataset.tab;
+        if (!active || active === 'orders') loadOrders();
+        if (loaded.payments) loadPayments();
+      })
+      .subscribe();
   }
 
   // ---- shop open / closed -------------------------------------------------
@@ -95,6 +108,7 @@
 
   // ===================== ORDERS ==========================================
   async function loadOrders() {
+    if (!(await ensureSession())) return;
     const status = document.getElementById('filter-status').value;
     let q = sb.from('orders').select('*, order_items(*)').order('created_at', { ascending: false }).limit(150);
     if (status) q = q.eq('status', status);
