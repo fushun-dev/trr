@@ -363,7 +363,7 @@
     submitBtn.disabled = true; submitBtn.textContent = 'Placing…';
 
     try {
-      let orderNumber = `TRR-${Date.now().toString().slice(-6)}`;
+      let orderNumber = `TRR-${Date.now().toString().slice(-3)}`;
       if (window.TRR_CONFIGURED && window.sb) {
         const session = await getSession();
         const { data: order, error } = await sb.from('orders').insert({

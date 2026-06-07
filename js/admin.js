@@ -132,7 +132,7 @@
     if (!orders.length) { host.innerHTML = `<p class="text-center text-gray-400 py-10">${I18N.t('a.noorders')}</p>`; return; }
 
     const orderCard = (o) => {
-      const items = (o.order_items || []).map((i) => `<li>${i.quantity}× ${i.product_name} <span class="text-gray-400">${money(i.line_total)}</span></li>`).join('');
+      const items = (o.order_items || []).map((i) => `<li class="font-bold text-gray-800">${i.quantity}× ${i.product_name} <span class="text-gray-400 font-normal">${money(i.line_total)}</span></li>`).join('');
       const time = new Date(o.created_at).toLocaleString('en-MY', { dateStyle: 'medium', timeStyle: 'short' });
       const ni = STATUS_FLOW.indexOf(o.status);
       const next = ni >= 0 && ni < STATUS_FLOW.length - 1 ? STATUS_FLOW[ni + 1] : null;
@@ -193,7 +193,7 @@
     }).join('');
 
     host.querySelectorAll('[data-advance]').forEach((b) => b.addEventListener('click', () => updateStatus(+b.dataset.advance, b.dataset.next)));
-    host.querySelectorAll('[data-cancel]').forEach((b) => b.addEventListener('click', () => { if (confirm('Cancel this order?')) updateStatus(+b.dataset.cancel, 'cancelled'); }));
+    host.querySelectorAll('[data-cancel]').forEach((b) => b.addEventListener('click', async () => { if (await confirmDialog(I18N.t('dlg.cancel_order'), { danger: true })) updateStatus(+b.dataset.cancel, 'cancelled'); }));
     host.querySelectorAll('[data-paid]').forEach((b) => b.addEventListener('click', () => markPaid(+b.dataset.paid)));
     injectIcons(host);
   }
@@ -321,7 +321,7 @@
   async function deleteProduct() {
     if (!(await ensureSession())) return;
     const id = document.getElementById('product-form').id.value;
-    if (!id || !confirm('Delete this item?')) return;
+    if (!id || !(await confirmDialog(I18N.t('dlg.del_item'), { danger: true }))) return;
     const { error } = await sb.from('products').delete().eq('id', +id);
     if (error) return showToast(error.message, 'error');
     showToast(I18N.t('a.deleted'), 'info'); closeModal('product-modal'); loadMenu();
@@ -358,7 +358,7 @@
   async function deleteCategory() {
     if (!(await ensureSession())) return;
     const id = document.getElementById('category-form').id.value;
-    if (!id || !confirm('Delete this category? Items keep existing but become uncategorised.')) return;
+    if (!id || !(await confirmDialog(I18N.t('dlg.del_category'), { danger: true }))) return;
     const { error } = await sb.from('categories').delete().eq('id', +id);
     if (error) return showToast(error.message, 'error');
     showToast(I18N.t('a.deleted'), 'info'); closeModal('category-modal'); loadCategoriesTab();
@@ -417,7 +417,7 @@
   async function deletePromo() {
     if (!(await ensureSession())) return;
     const id = document.getElementById('promo-form').id.value;
-    if (!id || !confirm('Delete this promotion?')) return;
+    if (!id || !(await confirmDialog(I18N.t('dlg.del_promo'), { danger: true }))) return;
     await sb.from('promotions').delete().eq('id', +id);
     showToast(I18N.t('a.deleted'), 'info'); closeModal('promo-modal'); loadPromos();
   }
@@ -464,7 +464,7 @@
   async function deleteCoupon() {
     if (!(await ensureSession())) return;
     const id = document.getElementById('coupon-form').id.value;
-    if (!id || !confirm('Delete this coupon?')) return;
+    if (!id || !(await confirmDialog(I18N.t('dlg.del_coupon'), { danger: true }))) return;
     await sb.from('coupons').delete().eq('id', +id);
     showToast(I18N.t('a.deleted'), 'info'); closeModal('coupon-modal'); loadCoupons();
   }
@@ -501,7 +501,7 @@
   async function deleteAnnounce() {
     if (!(await ensureSession())) return;
     const id = document.getElementById('announce-form').id.value;
-    if (!id || !confirm('Delete this announcement?')) return;
+    if (!id || !(await confirmDialog(I18N.t('dlg.del_announce'), { danger: true }))) return;
     await sb.from('announcements').delete().eq('id', +id);
     showToast(I18N.t('a.deleted'), 'info'); closeModal('announce-modal'); loadAnnounce();
   }
@@ -541,7 +541,7 @@
         <tbody>${rows || ('<tr><td class="py-6 px-3 text-gray-400" colspan="6">' + I18N.t('a.no_customers') + '</td></tr>')}</tbody>
       </table></div>`;
     host.querySelectorAll('[data-points]').forEach((b) => b.addEventListener('click', async () => {
-      const v = prompt(I18N.t('a.set_points'), b.dataset.cur);
+      const v = await promptDialog(I18N.t('a.set_points'), b.dataset.cur, { type: 'number' });
       if (v === null) return;
       const n = parseInt(v, 10); if (isNaN(n) || n < 0) return showToast('Enter a valid number', 'error');
       if (!(await ensureSession())) return;

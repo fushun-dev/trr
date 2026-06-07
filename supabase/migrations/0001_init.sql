@@ -120,7 +120,7 @@ begin
   if new.order_number is null or new.order_number = '' then
     new.order_number :=
       'TRR-' || to_char(now(), 'YYYYMMDD') || '-' ||
-      lpad(((floor(random() * 9000) + 1000))::text, 4, '0');
+      lpad(((floor(random() * 900) + 100))::text, 3, '0');
   end if;
   return new;
 end;

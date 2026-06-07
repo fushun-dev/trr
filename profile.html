@@ -13,15 +13,7 @@
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <header class="sticky top-0 z-30 glass">
-    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-      <a href="index.html" class="btn btn-ghost text-sm"><span class="icon" data-icon="logout" style="transform:rotate(180deg)"></span> <span data-i18n="guide.back">Back to store</span></a>
-      <div class="flex items-center gap-1.5">
-        <button id="lang-toggle" class="btn btn-ghost text-sm font-bold" aria-label="Language"><span class="icon" data-icon="globe"></span> <span data-lang-label>中文</span></button>
-        <button id="logout-btn" class="btn btn-ghost text-sm" aria-label="Logout"><span class="icon" data-icon="logout"></span></button>
-      </div>
-    </div>
-  </header>
+  <!-- shared site header is injected by js/chrome.js -->
 
   <section class="hero">
     <div class="max-w-3xl mx-auto px-4 py-10 md:py-14 text-center">
@@ -75,7 +67,15 @@
   <script src="js/config.js"></script>
   <script src="js/icons.js"></script>
   <script src="js/i18n.js"></script>
+  <script src="js/chrome.js"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/pwa.js"></script>
   <script src="js/profile.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  </script>
 </body>
 </html>

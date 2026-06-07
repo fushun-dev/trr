@@ -59,4 +59,54 @@
     }
     return true;
   };
+
+  // ---- in-app dialogs (replace native confirm/prompt) --------------------
+  const T = (k, fb) => (window.I18N ? I18N.t(k) : fb);
+
+  window.confirmDialog = function (message, opts = {}) {
+    return new Promise((resolve) => {
+      const host = document.createElement('div');
+      host.className = 'modal-backdrop open';
+      host.style.zIndex = 95;
+      host.innerHTML =
+        `<div class="modal p-6" style="max-width:380px">
+          <p class="text-gray-800 font-semibold text-base mb-5">${message}</p>
+          <div class="flex gap-2 justify-end">
+            <button class="btn btn-ghost" data-no>${opts.cancel || T('dlg.cancel', 'Cancel')}</button>
+            <button class="btn ${opts.danger ? '!bg-red-600 !text-white' : 'btn-primary'}" data-yes>${opts.ok || T('dlg.confirm', 'Confirm')}</button>
+          </div>
+        </div>`;
+      document.body.appendChild(host);
+      const close = (v) => { host.remove(); resolve(v); };
+      host.querySelector('[data-yes]').onclick = () => close(true);
+      host.querySelector('[data-no]').onclick = () => close(false);
+      host.onclick = (e) => { if (e.target === host) close(false); };
+      host.querySelector('[data-yes]').focus();
+    });
+  };
+
+  window.promptDialog = function (message, def = '', opts = {}) {
+    return new Promise((resolve) => {
+      const host = document.createElement('div');
+      host.className = 'modal-backdrop open';
+      host.style.zIndex = 95;
+      host.innerHTML =
+        `<div class="modal p-6" style="max-width:380px">
+          <p class="text-gray-800 font-semibold mb-3">${message}</p>
+          <input class="field" type="${opts.type || 'text'}" value="${String(def).replace(/"/g, '&quot;')}" />
+          <div class="flex gap-2 justify-end mt-4">
+            <button class="btn btn-ghost" data-no>${T('dlg.cancel', 'Cancel')}</button>
+            <button class="btn btn-primary" data-yes>${T('dlg.ok', 'OK')}</button>
+          </div>
+        </div>`;
+      document.body.appendChild(host);
+      const input = host.querySelector('input');
+      const close = (v) => { host.remove(); resolve(v); };
+      host.querySelector('[data-yes]').onclick = () => close(input.value);
+      host.querySelector('[data-no]').onclick = () => close(null);
+      host.onclick = (e) => { if (e.target === host) close(null); };
+      input.onkeydown = (e) => { if (e.key === 'Enter') close(input.value); if (e.key === 'Escape') close(null); };
+      setTimeout(() => { input.focus(); input.select(); }, 30);
+    });
+  };
 })();

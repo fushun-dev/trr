@@ -107,10 +107,8 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-shop-name]').forEach((el) => (el.textContent = (window.TRR_CONFIG || {}).SHOP_NAME || el.textContent));
-    document.getElementById('lang-toggle')?.addEventListener('click', () => I18N.toggle());
     document.getElementById('details-form')?.addEventListener('submit', saveDetails);
-    document.getElementById('logout-btn')?.addEventListener('click', async () => { if (sb) await sb.auth.signOut(); window.location.href = 'index.html'; });
     load();
+    document.addEventListener('lang:changed', () => { if (profile) { renderLoyalty(); renderHistory(); } });
   });
 })();
