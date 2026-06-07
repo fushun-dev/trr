@@ -56,6 +56,7 @@
     bag: P('<path d="M6 8h12l-1 12a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'),
     chevron: P('<path d="M6 9l6 6 6-6"/>'),
     book: P('<path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 1 2-2h12"/>'),
+    bell: P('<path d="M6 9a6 6 0 0 1 12 0c0 4.5 1.5 5.5 2 6H4c.5-.5 2-1.5 2-6z"/><path d="M10 19a2 2 0 0 0 4 0"/>'),
   };
 
   window.ICON = (name, cls) => {

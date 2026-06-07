@@ -402,6 +402,7 @@
       appliedCoupon = null;
       closeCheckout(); closeCart();
       askNotifyPermission();
+      pushNotif(I18N.t('notif.placed').replace('{n}', orderNumber));
       const sess = await getSession();
       if (sess) subscribeMyOrders(sess.user.id);
       showOrderSuccess(orderNumber, cfg.WHATSAPP ? `https://wa.me/${cfg.WHATSAPP}?text=${msg}` : null);
@@ -492,6 +493,7 @@
       ? I18N.t('notify.cancelled').replace('{n}', o.order_number)
       : I18N.t('notify.status').replace('{n}', o.order_number).replace('{s}', I18N.t('status.' + o.status));
     showToast(msg, o.status === 'cancelled' ? 'error' : 'success');
+    pushNotif(msg);
     try {
       if (window.Notification && Notification.permission === 'granted') {
         new Notification(cfg.SHOP_NAME, { body: msg, icon: 'assets/icons/icon-192.png', tag: 'trr-order-' + o.id });
@@ -499,6 +501,48 @@
     } catch (e) { /* ignore */ }
     if (document.getElementById('account-modal')?.classList.contains('open')) openAccount();
   }
+
+  // ---- notification center (bell) ----------------------------------------
+  const NOTIF_KEY = 'trr_notifs';
+  const notifRead = () => { try { return JSON.parse(localStorage.getItem(NOTIF_KEY)) || []; } catch { return []; } };
+  const notifWrite = (a) => { localStorage.setItem(NOTIF_KEY, JSON.stringify(a.slice(0, 50))); renderNotifBadge(); };
+  function pushNotif(text) {
+    const a = notifRead();
+    a.unshift({ t: text, at: Date.now(), read: false });
+    notifWrite(a);
+  }
+  window.pushNotif = pushNotif;
+  function renderNotifBadge() {
+    const n = notifRead().filter((x) => !x.read).length;
+    const el = document.getElementById('notif-count');
+    if (el) { el.textContent = n; el.style.display = n ? 'flex' : 'none'; }
+  }
+  function renderNotifList() {
+    const body = document.getElementById('notif-body');
+    if (!body) return;
+    const a = notifRead();
+    body.innerHTML = a.length
+      ? a.map((n) => `
+        <div class="py-3 border-b border-purple-50 ${n.read ? '' : 'font-semibold'}">
+          <p class="text-sm text-gray-700">${n.t}</p>
+          <p class="text-[11px] text-gray-400 mt-0.5 font-normal">${new Date(n.at).toLocaleString('en-MY', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+        </div>`).join('')
+      : `<div class="text-center text-gray-300 py-16"><div class="text-4xl mb-2 flex justify-center">${ICON('bell')}</div><p class="text-gray-400">${I18N.t('notif.empty')}</p></div>`;
+    injectIcons(body);
+  }
+  function openNotif() {
+    document.getElementById('notif-drawer').classList.add('open');
+    document.getElementById('notif-backdrop').classList.add('open');
+    document.body.classList.add('no-scroll');
+    renderNotifList();
+    notifWrite(notifRead().map((n) => ({ ...n, read: true }))); // mark all read
+  }
+  function closeNotif() {
+    document.getElementById('notif-drawer').classList.remove('open');
+    document.getElementById('notif-backdrop').classList.remove('open');
+    document.body.classList.remove('no-scroll');
+  }
+  window.openNotif = openNotif;
 
   window.subscribeMyOrders = function (userId) {
     if (!window.sb || !userId || window._myOrdersChannel) return;
@@ -541,7 +585,13 @@
 
     loadMenu();
     renderCart();
+    renderNotifBadge();
     if (window.TRR_CONFIGURED) getProfile().then((p) => { if (p) subscribeMyOrders(p.id); });
+
+    document.getElementById('notif-fab')?.addEventListener('click', openNotif);
+    document.getElementById('notif-close')?.addEventListener('click', closeNotif);
+    document.getElementById('notif-backdrop')?.addEventListener('click', closeNotif);
+    document.getElementById('notif-clear')?.addEventListener('click', () => { notifWrite([]); renderNotifList(); });
 
     document.getElementById('open-cart')?.addEventListener('click', openCart);
     document.getElementById('cart-fab')?.addEventListener('click', openCart);

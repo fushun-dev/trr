@@ -72,7 +72,16 @@
       </ol>
     </div>
   </div>
-  <button id="cart-fab" class="cart-fab md:hidden"><span class="icon icon-lg" data-icon="cart"></span><span id="fab-count" class="count" style="display:none">0</span></button>
+  <button id="notif-fab" class="cart-fab" aria-label="Notifications"><span class="icon icon-lg" data-icon="bell"></span><span id="notif-count" class="count" style="display:none">0</span></button>
+  <div id="notif-backdrop" class="drawer-backdrop"></div>
+  <aside id="notif-drawer" class="drawer">
+    <div class="brand-gradient text-white px-5 py-4 flex items-center justify-between">
+      <h3 class="font-bold text-lg" data-i18n="notif.title">Notifications</h3>
+      <button id="notif-close" class="text-white/90 text-2xl leading-none">&times;</button>
+    </div>
+    <div id="notif-body" class="flex-1 overflow-auto px-5 py-3"></div>
+    <div class="border-t border-purple-100 p-4"><button id="notif-clear" class="btn btn-ghost w-full" data-i18n="notif.clear">Clear all</button></div>
+  </aside>
   <div id="drawer-backdrop" class="drawer-backdrop"></div>
   <aside id="cart-drawer" class="drawer">
     <div class="brand-gradient text-white px-5 py-4 flex items-center justify-between">
