@@ -454,11 +454,12 @@
     const body = document.getElementById('account-body');
     body.innerHTML = `<p class="text-center text-gray-400 py-8">${I18N.t('acct.loading')}</p>`;
 
-    // Only current, live orders here — full history lives on the profile page.
+    // All of today's orders (any status) — full history lives on the profile page.
+    const startOfToday = new Date(); startOfToday.setHours(0, 0, 0, 0);
     const { data: orders } = await sb
       .from('orders').select('*, order_items(product_name,quantity)')
       .eq('customer_id', profile.id)
-      .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
+      .gte('created_at', startOfToday.toISOString())
       .order('created_at', { ascending: false });
 
     const list = (orders || []).length ? orders.map((o) => {
@@ -478,7 +479,7 @@
           </div>
         </div>`;
     }).join('')
-      : `<div class="text-center text-gray-400 py-10"><div class="text-4xl mb-2 flex justify-center">${ICON('bag')}</div><p>${I18N.t('acct.no_active')}</p></div>`;
+      : `<div class="text-center text-gray-400 py-10"><div class="text-4xl mb-2 flex justify-center">${ICON('bag')}</div><p>${I18N.t('acct.no_today')}</p></div>`;
 
     body.innerHTML = list + `<a href="profile.html" class="btn btn-ghost w-full py-3 mt-3">${I18N.t('acct.view_profile')}</a>`;
     injectIcons(body);
