@@ -532,7 +532,7 @@
       if (pMenu && !pMenu.classList.contains('hidden') && !e.target.closest('#profile-btn') && !e.target.closest('#profile-menu')) closeProfile();
     });
     document.getElementById('menu-profile')?.addEventListener('click', () => { closeProfile(); openAccount(); });
-    document.getElementById('menu-guide')?.addEventListener('click', () => { closeProfile(); openGuide(); });
+    document.getElementById('menu-guide')?.addEventListener('click', () => { window.location.href = 'guide.html'; });
     document.getElementById('menu-lang')?.addEventListener('click', () => { closeProfile(); I18N.toggle(); });
     document.getElementById('menu-logout')?.addEventListener('click', () => { closeProfile(); doLogout(); });
     document.addEventListener('lang:changed', () => {

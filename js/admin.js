@@ -50,6 +50,7 @@
     btn.className = 'btn text-sm ' + (shopOpen ? 'btn-ghost !text-red-600 !bg-red-50' : 'btn-primary');
   }
   async function toggleShop() {
+    if (!(await ensureSession())) return;
     const next = !shopOpen;
     const { error } = await sb.from('settings').upsert(
       { key: 'shop_open', value: String(next), updated_at: new Date().toISOString() }, { onConflict: 'key' });
@@ -80,6 +81,17 @@
   const closeModal = (id) => document.getElementById(id).classList.remove('open');
   const esc = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   const statusLabel = (s) => I18N.t('status.' + s);
+
+  // Ensure a valid (refreshed) session before any write, so a stale access
+  // token doesn't make the request anonymous and trip RLS.
+  async function ensureSession() {
+    let { data: { session } } = await sb.auth.getSession();
+    if (session && session.expires_at && session.expires_at * 1000 < Date.now() + 60000) {
+      session = (await sb.auth.refreshSession()).data.session;
+    }
+    if (!session) { showToast('Your session expired — please sign in again.', 'error'); showLogin(); return false; }
+    return true;
+  }
 
   // ===================== ORDERS ==========================================
   async function loadOrders() {
@@ -172,17 +184,21 @@
     injectIcons(host);
   }
   async function updateStatus(id, status) {
+    if (!(await ensureSession())) return;
     if (status === 'completed') {
       const { data } = await sb.from('orders').select('payment_status').eq('id', id).single();
       if (data && data.payment_status !== 'paid') return showToast(I18N.t('a.pay_to_complete'), 'error');
     }
-    const { error } = await sb.from('orders').update({ status }).eq('id', id);
+    const { data, error } = await sb.from('orders').update({ status }).eq('id', id).select();
     if (error) return showToast(error.message, 'error');
+    if (!data || !data.length) return showToast('Your session expired — please sign in again.', 'error');
     showToast(`${I18N.t('a.mark')} ${statusLabel(status)}`, 'success'); loadOrders();
   }
   async function markPaid(id) {
-    const { error } = await sb.from('orders').update({ payment_status: 'paid' }).eq('id', id);
+    if (!(await ensureSession())) return;
+    const { data, error } = await sb.from('orders').update({ payment_status: 'paid' }).eq('id', id).select();
     if (error) return showToast(error.message, 'error');
+    if (!data || !data.length) return showToast('Your session expired — please sign in again.', 'error');
     showToast(I18N.t('a.markpaid'), 'success');
     loadOrders(); if (loaded.payments) loadPayments();
   }
@@ -260,6 +276,7 @@
   async function uploadProductPhoto(e) {
     const file = e.target.files[0];
     if (!file) return;
+    if (!(await ensureSession())) return;
     const status = document.getElementById('product-photo-status');
     status.textContent = 'Uploading…'; status.className = 'text-xs text-purple-600 mt-1';
     try {
@@ -276,7 +293,7 @@
     }
   }
   async function saveProduct(e) {
-    e.preventDefault(); const f = e.target;
+    e.preventDefault(); if (!(await ensureSession())) return; const f = e.target;
     const row = {
       name: f.name.value.trim(), category_id: +f.category_id.value, description: f.description.value.trim(),
       price: +f.price.value, sale_price: f.sale_price.value ? +f.sale_price.value : null,
@@ -288,6 +305,7 @@
     showToast(I18N.t('a.saved'), 'success'); closeModal('product-modal'); loadMenu();
   }
   async function deleteProduct() {
+    if (!(await ensureSession())) return;
     const id = document.getElementById('product-form').id.value;
     if (!id || !confirm('Delete this item?')) return;
     const { error } = await sb.from('products').delete().eq('id', +id);
@@ -316,7 +334,7 @@
     openModal('category-modal');
   }
   async function saveCategory(e) {
-    e.preventDefault(); const f = e.target;
+    e.preventDefault(); if (!(await ensureSession())) return; const f = e.target;
     const row = { name: f.name.value.trim(), sort_order: +f.sort_order.value, active: f.active.value === 'true' };
     const id = f.id.value;
     const res = id ? await sb.from('categories').update(row).eq('id', +id) : await sb.from('categories').insert(row);
@@ -324,6 +342,7 @@
     showToast(I18N.t('a.saved'), 'success'); closeModal('category-modal'); loadCategoriesTab();
   }
   async function deleteCategory() {
+    if (!(await ensureSession())) return;
     const id = document.getElementById('category-form').id.value;
     if (!id || !confirm('Delete this category? Items keep existing but become uncategorised.')) return;
     const { error } = await sb.from('categories').delete().eq('id', +id);
@@ -369,7 +388,7 @@
     promoScopeUI(); openModal('promo-modal');
   }
   async function savePromo(e) {
-    e.preventDefault(); const f = e.target; const scope = f.scope.value;
+    e.preventDefault(); if (!(await ensureSession())) return; const f = e.target; const scope = f.scope.value;
     const row = {
       name: f.name.value.trim(), percent_off: +f.percent_off.value, scope,
       category_id: scope === 'category' ? +f.category_id.value : null,
@@ -382,6 +401,7 @@
     showToast(I18N.t('a.saved'), 'success'); closeModal('promo-modal'); loadPromos();
   }
   async function deletePromo() {
+    if (!(await ensureSession())) return;
     const id = document.getElementById('promo-form').id.value;
     if (!id || !confirm('Delete this promotion?')) return;
     await sb.from('promotions').delete().eq('id', +id);
@@ -416,7 +436,7 @@
     openModal('coupon-modal');
   }
   async function saveCoupon(e) {
-    e.preventDefault(); const f = e.target;
+    e.preventDefault(); if (!(await ensureSession())) return; const f = e.target;
     const row = {
       code: f.code.value.trim().toUpperCase(), discount_type: f.discount_type.value,
       discount_value: +f.discount_value.value, min_subtotal: +f.min_subtotal.value || 0,
@@ -428,6 +448,7 @@
     showToast(I18N.t('a.saved'), 'success'); closeModal('coupon-modal'); loadCoupons();
   }
   async function deleteCoupon() {
+    if (!(await ensureSession())) return;
     const id = document.getElementById('coupon-form').id.value;
     if (!id || !confirm('Delete this coupon?')) return;
     await sb.from('coupons').delete().eq('id', +id);
@@ -456,7 +477,7 @@
     f.active.value = String(a?.active ?? true); openModal('announce-modal');
   }
   async function saveAnnounce(e) {
-    e.preventDefault(); const f = e.target;
+    e.preventDefault(); if (!(await ensureSession())) return; const f = e.target;
     const row = { title: f.title.value.trim(), body: f.body.value.trim() || null, active: f.active.value === 'true' };
     const id = f.id.value;
     const res = id ? await sb.from('announcements').update(row).eq('id', +id) : await sb.from('announcements').insert(row);
@@ -464,6 +485,7 @@
     showToast(I18N.t('a.saved'), 'success'); closeModal('announce-modal'); loadAnnounce();
   }
   async function deleteAnnounce() {
+    if (!(await ensureSession())) return;
     const id = document.getElementById('announce-form').id.value;
     if (!id || !confirm('Delete this announcement?')) return;
     await sb.from('announcements').delete().eq('id', +id);
@@ -508,6 +530,7 @@
       const v = prompt(I18N.t('a.set_points'), b.dataset.cur);
       if (v === null) return;
       const n = parseInt(v, 10); if (isNaN(n) || n < 0) return showToast('Enter a valid number', 'error');
+      if (!(await ensureSession())) return;
       const { error } = await sb.from('profiles').update({ loyalty_points: n }).eq('id', b.dataset.points);
       if (error) return showToast(error.message, 'error');
       showToast(I18N.t('a.points_updated'), 'success'); loadCustomers();
@@ -562,7 +585,7 @@
       .forEach((k) => { if (f[k]) f[k].value = map[k] ?? ''; });
   }
   async function saveSettings(e) {
-    e.preventDefault(); const f = e.target;
+    e.preventDefault(); if (!(await ensureSession())) return; const f = e.target;
     const keys = ['shop_name', 'shop_tagline', 'address', 'hours', 'whatsapp', 'delivery_fee', 'free_delivery_over', 'bank_details'];
     const rows = keys.map((k) => ({ key: k, value: f[k].value.trim(), updated_at: new Date().toISOString() }));
     const { error } = await sb.from('settings').upsert(rows, { onConflict: 'key' });
