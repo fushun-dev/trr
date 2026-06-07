@@ -455,17 +455,20 @@
       const items = (o.order_items || []).map((i) => `${i.quantity}× ${i.product_name}`).join(', ');
       const canRate = o.status === 'completed' && !o.rating;
       const stars = o.rating ? renderStars(o.rating) : (canRate ? rateButtons(o.id) : '');
+      const paid = o.payment_status === 'paid';
       return `
         <div class="border border-purple-50 rounded-xl p-3 mb-2">
           <div class="flex items-center justify-between">
             <span class="font-bold text-gray-800 text-sm">${o.order_number}</span>
-            <span class="badge badge-${o.status}">${o.status}</span>
+            <span class="badge badge-${o.status}">${I18N.t('status.' + o.status)}</span>
           </div>
+          <p class="text-xs text-purple-600 mt-0.5">${I18N.t('sdesc.' + o.status)}</p>
           <p class="text-xs text-gray-500 mt-1">${items}</p>
           <div class="flex items-center justify-between mt-2">
             <span class="text-sm font-extrabold brand-gradient-text">${money(o.total)}</span>
             <span class="text-xs">${stars}</span>
           </div>
+          <p class="text-xs mt-1 ${paid ? 'text-emerald-600' : 'text-amber-600'}">${paid ? I18N.t('a.paid') : I18N.t('a.unpaid')}</p>
         </div>`;
     }).join('') : `<p class="text-center text-gray-400 py-6">${I18N.t('acct.noorders')}</p>`;
 

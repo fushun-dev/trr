@@ -129,10 +129,15 @@
           <span class="text-gray-400 font-bold">${I18N.t('a.total')}</span><span class="text-right font-extrabold brand-gradient-text">${money(o.total)}</span>
         </div>
         <div class="flex gap-2 mt-3 flex-wrap">
-          ${next ? `<button class="btn btn-primary text-sm flex-1" data-advance="${o.id}" data-next="${next}">${I18N.t('a.mark')} ${statusLabel(next)}</button>` : ''}
+          ${next
+            ? (next === 'completed' && o.payment_status !== 'paid'
+                ? `<button class="btn btn-ghost !text-gray-400 !bg-gray-100 text-sm flex-1" disabled>${I18N.t('a.mark')} ${statusLabel(next)}</button>`
+                : `<button class="btn btn-primary text-sm flex-1" data-advance="${o.id}" data-next="${next}">${I18N.t('a.mark')} ${statusLabel(next)}</button>`)
+            : ''}
           ${o.payment_status !== 'paid' ? `<button class="btn btn-ghost !text-emerald-700 !bg-emerald-50 text-sm" data-paid="${o.id}">${I18N.t('a.markpaid')}</button>` : ''}
           ${o.status !== 'cancelled' && o.status !== 'completed' ? `<button class="btn btn-ghost !text-red-600 !bg-red-50 text-sm" data-cancel="${o.id}">${I18N.t('a.cancel')}</button>` : ''}
         </div>
+        ${next === 'completed' && o.payment_status !== 'paid' ? `<p class="text-xs text-amber-600 mt-2">${I18N.t('a.pay_to_complete')}</p>` : ''}
       </div>`;
     };
 
@@ -157,8 +162,7 @@
           <span class="w-2.5 h-2.5 rounded-full ${c.dot} ${c.pulse ? 'dot-pulse' : ''}"></span>
           <h3 class="font-extrabold ${c.text}">${statusLabel(st)} <span class="text-gray-400 font-semibold">(${groups[st].length})</span></h3>
         </div>
-        <p class="text-xs text-gray-400 mb-2 ml-[18px]">${I18N.t('sdesc.' + st)}</p>
-        <div class="space-y-3">${groups[st].map(orderCard).join('')}</div>
+        <div class="space-y-3 mt-2">${groups[st].map(orderCard).join('')}</div>
       </section>`;
     }).join('');
 
@@ -168,6 +172,10 @@
     injectIcons(host);
   }
   async function updateStatus(id, status) {
+    if (status === 'completed') {
+      const { data } = await sb.from('orders').select('payment_status').eq('id', id).single();
+      if (data && data.payment_status !== 'paid') return showToast(I18N.t('a.pay_to_complete'), 'error');
+    }
     const { error } = await sb.from('orders').update({ status }).eq('id', id);
     if (error) return showToast(error.message, 'error');
     showToast(`${I18N.t('a.mark')} ${statusLabel(status)}`, 'success'); loadOrders();
