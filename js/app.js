@@ -401,6 +401,9 @@
       Cart.clear();
       appliedCoupon = null;
       closeCheckout(); closeCart();
+      askNotifyPermission();
+      const sess = await getSession();
+      if (sess) subscribeMyOrders(sess.user.id);
       showOrderSuccess(orderNumber, cfg.WHATSAPP ? `https://wa.me/${cfg.WHATSAPP}?text=${msg}` : null);
     } catch (err) {
       console.error(err);
@@ -482,6 +485,39 @@
   };
   window.closeAccount = () => document.getElementById('account-modal').classList.remove('open');
 
+  // ---- live order notifications (status changes) --------------------------
+  function notifyOrder(o) {
+    const msg = o.status === 'cancelled'
+      ? I18N.t('notify.cancelled').replace('{n}', o.order_number)
+      : I18N.t('notify.status').replace('{n}', o.order_number).replace('{s}', I18N.t('status.' + o.status));
+    showToast(msg, o.status === 'cancelled' ? 'error' : 'success');
+    try {
+      if (window.Notification && Notification.permission === 'granted') {
+        new Notification(cfg.SHOP_NAME, { body: msg, icon: 'assets/icons/icon-192.png', tag: 'trr-order-' + o.id });
+      }
+    } catch (e) { /* ignore */ }
+    if (document.getElementById('account-modal')?.classList.contains('open')) openAccount();
+  }
+
+  window.subscribeMyOrders = function (userId) {
+    if (!window.sb || !userId || window._myOrdersChannel) return;
+    window._myOrdersChannel = sb.channel('my-orders-' + userId)
+      .on('postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'orders', filter: 'customer_id=eq.' + userId },
+        (payload) => {
+          const o = payload.new;
+          if (!o) return;
+          // only notify when the order status actually changes
+          if (payload.old && payload.old.status === o.status) return;
+          notifyOrder(o);
+        })
+      .subscribe();
+  };
+  // Ask for notification permission (called from a user gesture, e.g. checkout).
+  window.askNotifyPermission = function () {
+    try { if (window.Notification && Notification.permission === 'default') Notification.requestPermission(); } catch (e) {}
+  };
+
   const renderStars = (n) =>
     Array.from({ length: 5 }, (_, i) => `<span class="${i < n ? 'text-amber-400' : 'text-gray-300'}">${ICON('sparkle')}</span>`).join('');
   const rateButtons = (orderId) =>
@@ -504,6 +540,7 @@
 
     loadMenu();
     renderCart();
+    if (window.TRR_CONFIGURED) getProfile().then((p) => { if (p) subscribeMyOrders(p.id); });
 
     document.getElementById('open-cart')?.addEventListener('click', openCart);
     document.getElementById('cart-fab')?.addEventListener('click', openCart);

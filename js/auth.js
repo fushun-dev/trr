@@ -86,6 +86,8 @@
       langToggle?.classList.add('hidden'); // language lives in the profile menu when signed in
       if (userName) userName.textContent = (profile.full_name || 'Account').split(' ')[0];
       document.getElementById('admin-link')?.classList.toggle('hidden', profile.role !== 'admin');
+      if (window.subscribeMyOrders) window.subscribeMyOrders(profile.id);
+      window.askNotifyPermission && window.askNotifyPermission();
     } else {
       loginBtn.classList.remove('hidden');
       userBox?.classList.add('hidden');
