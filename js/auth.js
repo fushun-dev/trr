@@ -46,6 +46,13 @@
       } else {
         const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        // Route admins straight to the staff dashboard (HSI-style routeByRole).
+        const profile = await getProfile();
+        if (profile && profile.role === 'admin') {
+          showToast('Welcome back, admin — opening dashboard…', 'success');
+          window.location.href = 'admin/index.html';
+          return;
+        }
         showToast('Welcome back!', 'success');
       }
       closeAuth();
@@ -74,6 +81,7 @@
       loginBtn.classList.add('hidden');
       userBox?.classList.remove('hidden');
       if (userName) userName.textContent = (profile.full_name || 'Account').split(' ')[0];
+      document.getElementById('admin-link')?.classList.toggle('hidden', profile.role !== 'admin');
     } else {
       loginBtn.classList.remove('hidden');
       userBox?.classList.add('hidden');
