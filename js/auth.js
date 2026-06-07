@@ -81,14 +81,20 @@
     if (!loginBtn) return;
     const profile = window.TRR_CONFIGURED ? await getProfile() : null;
     const langToggle = document.getElementById('lang-toggle');
+    const session = window.TRR_CONFIGURED ? await getSession() : null;
+    const email = session && session.user && session.user.email;
+    // fushun92 is always treated as admin (hard-coded), plus anyone with role=admin
+    const isAdmin = !!profile && (profile.role === 'admin' || email === 'fushun92@gmail.com');
     if (profile) {
       loginBtn.classList.add('hidden');
       userBox?.classList.remove('hidden');
       langToggle?.classList.add('hidden'); // language lives in the profile menu when signed in
       if (userName) userName.textContent = (profile.full_name || 'Account').split(' ')[0];
-      document.getElementById('admin-link')?.classList.toggle('hidden', profile.role !== 'admin');
-      if (window.subscribeMyOrders) window.subscribeMyOrders(profile.id);
-      window.askNotifyPermission && window.askNotifyPermission();
+      // Admins aren't buyers: hide the shopping-bag (My orders); show the dashboard gear.
+      document.getElementById('account-btn')?.classList.toggle('hidden', isAdmin);
+      document.getElementById('admin-link')?.classList.toggle('hidden', !isAdmin);
+      if (!isAdmin && window.subscribeMyOrders) window.subscribeMyOrders(profile.id);
+      if (!isAdmin && window.askNotifyPermission) window.askNotifyPermission();
     } else {
       loginBtn.classList.remove('hidden');
       userBox?.classList.add('hidden');

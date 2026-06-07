@@ -649,7 +649,7 @@
     loadMenu();
     renderCart();
     renderNotifBadge();
-    if (window.TRR_CONFIGURED) getProfile().then((p) => { if (p) subscribeMyOrders(p.id); });
+    if (window.TRR_CONFIGURED) getProfile().then((p) => { if (p && p.role !== 'admin') subscribeMyOrders(p.id); });
 
     document.getElementById('notif-fab')?.addEventListener('click', openNotif);
     document.getElementById('notif-close')?.addEventListener('click', closeNotif);
