@@ -29,14 +29,29 @@
         </div>
       </div>
       <div class="flex items-center gap-1.5">
+        <!-- shop open/closed indicator -->
+        <span id="header-shop-status" class="hidden items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full"></span>
+
         <button id="lang-toggle" class="btn btn-ghost text-sm font-bold" aria-label="Language"><span class="icon" data-icon="globe"></span> <span data-lang-label>中文</span></button>
         <button id="login-btn" class="btn btn-primary text-sm"><span class="icon" data-icon="user"></span> <span data-i18n="nav.signin">Sign in</span></button>
+
         <div id="user-box" class="hidden flex items-center gap-1.5">
-          <span class="text-sm font-semibold text-purple-700 hidden md:inline">Hi, <span id="user-name">there</span></span>
-          <button id="account-btn" class="btn btn-ghost text-sm"><span class="icon" data-icon="user"></span> <span class="hidden sm:inline" data-i18n="nav.myorders">My orders</span></button>
-          <a id="admin-link" href="admin/index.html" class="btn btn-ghost text-sm hidden"><span class="icon" data-icon="gear"></span> <span class="hidden sm:inline" data-i18n="nav.admin">Admin</span></a>
-          <button id="logout-btn" class="btn btn-ghost text-sm" aria-label="Logout"><span class="icon" data-icon="logout"></span></button>
+          <button id="account-btn" class="btn btn-ghost text-sm" aria-label="My orders" data-i18n-aria="nav.myorders"><span class="icon" data-icon="bag"></span></button>
+          <a id="admin-link" href="admin/index.html" class="btn btn-ghost text-sm hidden" aria-label="Admin" data-i18n-aria="nav.admin"><span class="icon" data-icon="gear"></span></a>
+
+          <!-- profile dropdown -->
+          <div class="relative">
+            <button id="profile-btn" class="btn btn-ghost text-sm" aria-label="Profile"><span class="icon" data-icon="user"></span> <span class="icon text-xs" data-icon="chevron"></span></button>
+            <div id="profile-menu" class="profile-menu hidden">
+              <div class="px-3 py-2 border-b border-purple-50 text-xs text-gray-400">Hi, <span id="user-name" class="font-semibold text-purple-700">there</span></div>
+              <button id="menu-profile" class="profile-item"><span class="icon" data-icon="user"></span> <span data-i18n="menu.profile">My profile</span></button>
+              <button id="menu-guide" class="profile-item"><span class="icon" data-icon="book"></span> <span data-i18n="menu.guide">User guide</span></button>
+              <button id="menu-lang" class="profile-item"><span class="icon" data-icon="globe"></span> <span data-i18n="menu.language">中文 / English</span></button>
+              <button id="menu-logout" class="profile-item text-red-600"><span class="icon" data-icon="logout"></span> <span data-i18n="menu.logout">Logout</span></button>
+            </div>
+          </div>
         </div>
+
         <button id="open-cart" class="btn btn-primary text-sm relative">
           <span class="icon" data-icon="cart"></span> <span class="hidden sm:inline" data-i18n="nav.cart">Cart</span> <span id="cart-count" class="ml-0.5 font-bold">0</span>
         </button>
@@ -276,6 +291,23 @@
         <button id="account-close" class="text-gray-400 text-2xl leading-none">&times;</button>
       </div>
       <div id="account-body"></div>
+    </div>
+  </div>
+
+  <!-- User guide modal -->
+  <div id="guide-modal" class="modal-backdrop">
+    <div class="modal p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-extrabold text-gray-800" data-i18n="guide.title">User guide</h3>
+        <button id="guide-close" class="text-gray-400 text-2xl leading-none">&times;</button>
+      </div>
+      <ol class="space-y-3 text-sm text-gray-600">
+        <li class="flex gap-3 items-start"><span class="ib-icon !w-7 !h-7 text-white text-xs shrink-0">1</span> <span data-i18n="guide.s1">Browse the menu and tap Add.</span></li>
+        <li class="flex gap-3 items-start"><span class="ib-icon !w-7 !h-7 text-white text-xs shrink-0">2</span> <span data-i18n="guide.s2">Open your cart and tap Checkout.</span></li>
+        <li class="flex gap-3 items-start"><span class="ib-icon !w-7 !h-7 text-white text-xs shrink-0">3</span> <span data-i18n="guide.s3">Choose pickup or delivery and place your order.</span></li>
+        <li class="flex gap-3 items-start"><span class="ib-icon !w-7 !h-7 text-white text-xs shrink-0">4</span> <span data-i18n="guide.s4">Track your order under My orders.</span></li>
+        <li class="flex gap-3 items-start"><span class="ib-icon !w-7 !h-7 text-white text-xs shrink-0">5</span> <span data-i18n="guide.s5">Tip: install the app to your home screen.</span></li>
+      </ol>
     </div>
   </div>
 

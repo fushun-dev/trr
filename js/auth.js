@@ -79,14 +79,17 @@
     const userName = document.getElementById('user-name');
     if (!loginBtn) return;
     const profile = window.TRR_CONFIGURED ? await getProfile() : null;
+    const langToggle = document.getElementById('lang-toggle');
     if (profile) {
       loginBtn.classList.add('hidden');
       userBox?.classList.remove('hidden');
+      langToggle?.classList.add('hidden'); // language lives in the profile menu when signed in
       if (userName) userName.textContent = (profile.full_name || 'Account').split(' ')[0];
       document.getElementById('admin-link')?.classList.toggle('hidden', profile.role !== 'admin');
     } else {
       loginBtn.classList.remove('hidden');
       userBox?.classList.add('hidden');
+      langToggle?.classList.remove('hidden');
     }
   }
   window.refreshAuthUI = refreshAuthUI;
