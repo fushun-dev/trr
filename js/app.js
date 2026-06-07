@@ -442,30 +442,18 @@
     const body = document.getElementById('account-body');
     body.innerHTML = `<p class="text-center text-gray-400 py-8">${I18N.t('acct.loading')}</p>`;
 
-    const pts = profile.loyalty_points || 0;
-    const { tier, next } = tierFor(pts);
-    const toNext = next ? next.min - pts : 0;
+    // Only current, live orders here — full history lives on the profile page.
     const { data: orders } = await sb
       .from('orders').select('*, order_items(product_name,quantity)')
-      .eq('customer_id', profile.id).order('created_at', { ascending: false }).limit(30);
-
-    const loyalty = `
-      <div class="brand-gradient text-white rounded-2xl p-5 mb-4">
-        <div class="flex items-center justify-between">
-          <div><p class="text-white/80 text-xs">${I18N.t('acct.points')}</p><p class="text-3xl font-extrabold">${pts}</p></div>
-          <div class="text-right"><p class="text-white/80 text-xs">${I18N.t('acct.tier')}</p><p class="text-xl font-extrabold">${tier.name}</p></div>
-        </div>
-        ${next ? `<p class="text-white/80 text-xs mt-3">${toNext} ${I18N.t('acct.tonext')} ${next.name}</p>` : `<p class="text-white/80 text-xs mt-3">${I18N.t('acct.top')}</p>`}
-      </div>
-      <p class="text-xs text-gray-400 mb-2">${I18N.t('acct.earn')}</p>`;
+      .eq('customer_id', profile.id)
+      .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
+      .order('created_at', { ascending: false });
 
     const list = (orders || []).length ? orders.map((o) => {
       const items = (o.order_items || []).map((i) => `${i.quantity}× ${i.product_name}`).join(', ');
-      const canRate = o.status === 'completed' && !o.rating;
-      const stars = o.rating ? renderStars(o.rating) : (canRate ? rateButtons(o.id) : '');
       const paid = o.payment_status === 'paid';
       return `
-        <div class="border border-purple-50 rounded-xl p-3 mb-2">
+        <div class="border border-purple-50 rounded-xl p-3 mb-2 ord-${o.status}">
           <div class="flex items-center justify-between">
             <span class="font-bold text-gray-800 text-sm">${o.order_number}</span>
             <span class="badge badge-${o.status}">${I18N.t('status.' + o.status)}</span>
@@ -474,15 +462,13 @@
           <p class="text-xs text-gray-500 mt-1">${items}</p>
           <div class="flex items-center justify-between mt-2">
             <span class="text-sm font-extrabold brand-gradient-text">${money(o.total)}</span>
-            <span class="text-xs">${stars}</span>
+            <span class="text-xs ${paid ? 'text-emerald-600' : 'text-amber-600'}">${paid ? I18N.t('a.paid') : I18N.t('a.unpaid')}</span>
           </div>
-          <p class="text-xs mt-1 ${paid ? 'text-emerald-600' : 'text-amber-600'}">${paid ? I18N.t('a.paid') : I18N.t('a.unpaid')}</p>
         </div>`;
-    }).join('') : `<p class="text-center text-gray-400 py-6">${I18N.t('acct.noorders')}</p>`;
+    }).join('')
+      : `<div class="text-center text-gray-400 py-10"><div class="text-4xl mb-2 flex justify-center">${ICON('bag')}</div><p>${I18N.t('acct.no_active')}</p></div>`;
 
-    body.innerHTML = loyalty + `<h4 class="font-bold text-gray-800 mb-2">${I18N.t('acct.history')}</h4>` + list;
-    body.querySelectorAll('[data-rate]').forEach((b) =>
-      b.addEventListener('click', () => submitRating(+b.dataset.order, +b.dataset.rate)));
+    body.innerHTML = list + `<a href="profile.html" class="btn btn-ghost w-full py-3 mt-3">${I18N.t('acct.view_profile')}</a>`;
     injectIcons(body);
   };
   window.closeAccount = () => document.getElementById('account-modal').classList.remove('open');
@@ -531,7 +517,7 @@
     document.addEventListener('click', (e) => {
       if (pMenu && !pMenu.classList.contains('hidden') && !e.target.closest('#profile-btn') && !e.target.closest('#profile-menu')) closeProfile();
     });
-    document.getElementById('menu-profile')?.addEventListener('click', () => { closeProfile(); openAccount(); });
+    document.getElementById('menu-profile')?.addEventListener('click', () => { window.location.href = 'profile.html'; });
     document.getElementById('menu-guide')?.addEventListener('click', () => { window.location.href = 'guide.html'; });
     document.getElementById('menu-lang')?.addEventListener('click', () => { closeProfile(); I18N.toggle(); });
     document.getElementById('menu-logout')?.addEventListener('click', () => { closeProfile(); doLogout(); });
