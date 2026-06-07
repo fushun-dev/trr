@@ -81,7 +81,8 @@
     }
     const pill = document.getElementById('header-shop-status');
     if (pill) {
-      pill.className = 'inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ' + (closed ? 'status-closed' : 'status-open');
+      // hidden on phones (the red banner covers the closed state); shown from sm up
+      pill.className = 'hidden sm:inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ' + (closed ? 'status-closed' : 'status-open');
       pill.innerHTML = `<span class="w-2 h-2 rounded-full ${closed ? 'bg-red-500 dot-pulse' : 'bg-emerald-500'}"></span> ${closed ? I18N.t('hdr.closed') : I18N.t('hdr.open')}`;
     }
   }
@@ -160,7 +161,7 @@
             <div class="p-4 flex flex-col flex-1">
               <h3 class="font-bold text-gray-800 leading-snug">${p.name}</h3>
               <p class="text-sm text-gray-500 mt-1 flex-1">${p.description || ''}</p>
-              <div class="flex items-center justify-between mt-3 gap-2">
+              <div class="flex flex-wrap items-center justify-between mt-3 gap-2">
                 <div>${priceHtml}</div>
                 ${sold
                   ? `<span class="badge badge-cancelled">${I18N.t('menu.soldout')}</span>`

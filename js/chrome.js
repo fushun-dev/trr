@@ -19,7 +19,7 @@
       </a>
       <div class="flex items-center gap-1.5">
         <span id="header-shop-status" class="hidden items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full"></span>
-        <button id="lang-toggle" class="btn btn-ghost text-sm font-bold" aria-label="Language"><span class="icon" data-icon="globe"></span> <span data-lang-label>中文</span></button>
+        <button id="lang-toggle" class="btn btn-ghost text-sm font-bold" aria-label="Language"><span class="icon" data-icon="globe"></span> <span class="hidden sm:inline" data-lang-label>中文</span></button>
         <button id="login-btn" class="btn btn-primary text-sm"><span class="icon" data-icon="user"></span> <span data-i18n="nav.signin">Sign in</span></button>
         <div id="user-box" class="hidden flex items-center gap-1.5">
           <button id="account-btn" class="btn btn-ghost text-sm" aria-label="My orders" data-i18n-aria="nav.myorders"><span class="icon" data-icon="bag"></span></button>
