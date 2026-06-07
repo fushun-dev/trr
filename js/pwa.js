@@ -6,7 +6,7 @@
  * Dismissals are remembered for ~14 days.
  */
 (function () {
-  const DISMISS_KEY = 'trr_install_dismissed';
+  const DISMISS_KEY = 'trr_install_dismissed_v2';
   let deferredPrompt = null;
 
   const isStandalone = () =>
@@ -61,6 +61,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('install-btn')?.addEventListener('click', doInstall);
+    document.getElementById('footer-install')?.addEventListener('click', doInstall);
     document.getElementById('install-dismiss')?.addEventListener('click', dismiss);
     document.getElementById('ios-sheet-close')?.addEventListener('click', hide);
     document.getElementById('ios-install-sheet')?.addEventListener('click', (e) => {
