@@ -174,7 +174,9 @@
                 <div>${priceHtml}</div>
                 ${sold
                   ? `<span class="badge badge-cancelled">${I18N.t('menu.soldout')}</span>`
-                  : `<button class="btn btn-primary text-sm shrink-0" data-add="${p.id}"><span class="icon" data-icon="plus"></span> ${I18N.t('menu.add')}</button>`}
+                  : (window.IS_ADMIN
+                      ? ''
+                      : `<button class="btn btn-primary text-sm shrink-0" data-add="${p.id}"><span class="icon" data-icon="plus"></span> ${I18N.t('menu.add')}</button>`)}
               </div>
             </div>
           </div>`;
@@ -650,7 +652,14 @@
     loadMenu();
     renderCart();
     renderNotifBadge();
-    if (window.TRR_CONFIGURED) getProfile().then((p) => { if (p && p.role !== 'admin') subscribeMyOrders(p.id); });
+    if (window.TRR_CONFIGURED) getProfile().then((p) => {
+      const admin = !!p && p.role === 'admin';
+      window.IS_ADMIN = admin;
+      document.body.classList.toggle('admin-preview', admin);
+      document.getElementById('admin-preview-bar')?.classList.toggle('hidden', !admin);
+      if (admin) renderProducts();              // re-render without Add buttons
+      else if (p) subscribeMyOrders(p.id);      // buyers get order notifications
+    });
 
     document.getElementById('notif-fab')?.addEventListener('click', openNotif);
     document.getElementById('notif-close')?.addEventListener('click', closeNotif);
