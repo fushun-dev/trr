@@ -592,6 +592,27 @@
   }
   window.openNotif = openNotif;
 
+  // ---- buyer auto-logout after 15 minutes of inactivity ------------------
+  const IDLE_MS = 15 * 60 * 1000;
+  let _idleTimer;
+  function resetIdle() { clearTimeout(_idleTimer); _idleTimer = setTimeout(onIdle, IDLE_MS); }
+  async function onIdle() {
+    if (!window.TRR_CONFIGURED || !window.sb) return;
+    const profile = await getProfile();
+    // Buyers only — never auto-logout admins (or while previewing as admin).
+    if (profile && profile.role !== 'admin' && !window.IS_ADMIN) {
+      await sb.auth.signOut();
+      if (window.clearUserData) window.clearUserData();
+      showToast(I18N.t('toast.idle'), 'info');
+      if (window.refreshAuthUI) window.refreshAuthUI();
+    }
+  }
+  function startIdleWatch() {
+    ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'].forEach((e) =>
+      document.addEventListener(e, resetIdle, { passive: true }));
+    resetIdle();
+  }
+
   // Wipe per-user local data (cart, notifications, snapshot) — used on account
   // switch and logout so one user never sees another's data on a shared device.
   window.clearUserData = function () {
@@ -657,6 +678,7 @@
     document.querySelectorAll('[data-shop-tagline]').forEach((el) => (el.textContent = cfg.SHOP_TAGLINE));
 
     if (window.SHOP_OPEN === undefined) window.SHOP_OPEN = true; // optimistic default
+    startIdleWatch();
     applyShopStatus();
     renderBanner();   // show default banner right away; loadAnnouncements refines it
     loadMenu();
