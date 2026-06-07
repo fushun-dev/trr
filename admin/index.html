@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · Taiwan Rice Roll</title>
+  <meta name="theme-color" content="#6d28d9" />
+  <link rel="icon" href="../assets/icons/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="brand-gradient text-white">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center text-lg">🍙</div>
+        <div class="leading-tight">
+          <p class="font-extrabold">Staff Dashboard</p>
+          <p class="text-[11px] text-white/70" data-shop-name>Taiwan Rice Roll</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="../index.html" class="btn btn-ghost !text-white !bg-white/15 text-sm">View store</a>
+        <button id="admin-logout" class="btn btn-ghost !text-white !bg-white/15 text-sm hidden">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login gate -->
+  <div id="login-gate" class="max-w-sm mx-auto mt-16 px-4">
+    <div class="card p-6">
+      <h2 class="text-xl font-extrabold text-gray-800 mb-1">Staff sign in</h2>
+      <p class="text-sm text-gray-500 mb-4">Admin accounts only.</p>
+      <form id="admin-login-form" class="space-y-3">
+        <input name="email" type="email" required class="field" placeholder="Email" />
+        <input name="password" type="password" required class="field" placeholder="Password" />
+        <button type="submit" class="btn btn-primary w-full py-3">Sign in</button>
+      </form>
+      <p id="config-warning" class="hidden mt-4 text-sm text-amber-700 bg-amber-50 rounded-lg p-3">
+        Supabase isn't configured yet. Add your keys in <code>js/config.js</code>.
+      </p>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <main id="dashboard" class="hidden max-w-6xl mx-auto px-4 py-6">
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-6">
+      <button class="chip active" data-tab="orders">📦 Orders</button>
+      <button class="chip" data-tab="menu">🍙 Menu</button>
+    </div>
+
+    <!-- Orders tab -->
+    <section id="tab-orders">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+        <div class="card p-4"><p class="text-xs text-gray-500">Today's orders</p><p id="stat-today" class="text-2xl font-extrabold brand-gradient-text">0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500">Pending</p><p id="stat-pending" class="text-2xl font-extrabold text-amber-600">0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500">Preparing</p><p id="stat-preparing" class="text-2xl font-extrabold text-purple-600">0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500">Today's sales</p><p id="stat-sales" class="text-2xl font-extrabold text-emerald-600">RM 0</p></div>
+      </div>
+
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-extrabold text-gray-800">Orders</h2>
+        <div class="flex gap-2">
+          <select id="filter-status" class="field !py-1.5 !w-auto text-sm">
+            <option value="">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="preparing">Preparing</option>
+            <option value="ready">Ready</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <button id="refresh-orders" class="btn btn-ghost text-sm">↻ Refresh</button>
+        </div>
+      </div>
+      <div id="orders-list" class="space-y-3"></div>
+    </section>
+
+    <!-- Menu tab -->
+    <section id="tab-menu" class="hidden">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-extrabold text-gray-800">Menu items</h2>
+        <button id="add-product" class="btn btn-primary text-sm">+ Add item</button>
+      </div>
+      <div id="menu-list" class="grid md:grid-cols-2 gap-3"></div>
+    </section>
+  </main>
+
+  <!-- Product editor modal -->
+  <div id="product-modal" class="modal-backdrop">
+    <div class="modal p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="product-modal-title" class="text-xl font-extrabold text-gray-800">Add item</h3>
+        <button id="product-close" class="text-gray-400 text-2xl leading-none">×</button>
+      </div>
+      <form id="product-form" class="space-y-3">
+        <input type="hidden" name="id" />
+        <div><label class="text-xs font-semibold text-gray-500">Name</label>
+          <input name="name" required class="field mt-1" placeholder="e.g. Smoked Duck Rice Roll 烟熏鸭肉饭团" /></div>
+        <div><label class="text-xs font-semibold text-gray-500">Category</label>
+          <select name="category_id" class="field mt-1"></select></div>
+        <div><label class="text-xs font-semibold text-gray-500">Description</label>
+          <input name="description" class="field mt-1" placeholder="Short description" /></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-xs font-semibold text-gray-500">Price (RM)</label>
+            <input name="price" type="number" step="0.01" min="0" required class="field mt-1" /></div>
+          <div><label class="text-xs font-semibold text-gray-500">Available</label>
+            <select name="available" class="field mt-1"><option value="true">Yes</option><option value="false">No</option></select></div>
+        </div>
+        <div><label class="text-xs font-semibold text-gray-500">Image URL (optional)</label>
+          <input name="image_url" class="field mt-1" placeholder="https://…" /></div>
+        <div class="flex gap-2 pt-1">
+          <button type="submit" class="btn btn-primary flex-1 py-3">Save</button>
+          <button type="button" id="product-delete" class="btn btn-ghost !text-red-600 !bg-red-50 hidden">Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/admin.js"></script>
+</body>
+</html>

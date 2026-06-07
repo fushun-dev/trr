@@ -1,0 +1,10 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Local env / secrets (config.js is committed with the public anon key only)
+.env
+.env.*

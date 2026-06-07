@@ -1,0 +1,155 @@
+/* =========================================================================
+   Fan Tuan · Taiwanese Rice Roll — purple gradient theme
+   Tailwind handles layout/utilities (via CDN); this adds brand styling.
+   ========================================================================= */
+:root {
+  --purple-900: #3b0764;
+  --purple-800: #4c1d95;
+  --purple-700: #6d28d9;
+  --purple-600: #7c3aed;
+  --purple-500: #8b5cf6;
+  --purple-400: #a78bfa;
+  --purple-300: #c4b5fd;
+  --accent:     #f0abfc; /* pink-purple highlight */
+  --ink:        #1e1b2e;
+}
+
+* { -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 600px at 100% -10%, rgba(192,132,252,.25), transparent 60%),
+    radial-gradient(900px 500px at -10% 0%, rgba(124,58,237,.18), transparent 55%),
+    #faf7ff;
+}
+
+/* --- gradients --------------------------------------------------------- */
+.brand-gradient {
+  background: linear-gradient(135deg, var(--purple-800) 0%, var(--purple-600) 45%, var(--purple-400) 100%);
+}
+.brand-gradient-text {
+  background: linear-gradient(135deg, var(--purple-700), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero {
+  background:
+    radial-gradient(800px 400px at 80% 10%, rgba(240,171,252,.35), transparent 60%),
+    linear-gradient(135deg, var(--purple-900) 0%, var(--purple-700) 55%, var(--purple-500) 100%);
+  color: #fff;
+}
+
+/* --- glass / cards ----------------------------------------------------- */
+.glass {
+  background: rgba(255, 255, 255, .85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(124, 58, 237, .12);
+}
+.card {
+  background: #fff;
+  border: 1px solid rgba(124, 58, 237, .12);
+  border-radius: 1rem;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.card:hover { transform: translateY(-3px); box-shadow: 0 16px 40px -18px rgba(109, 40, 217, .45); }
+
+.thumb-fallback {
+  background: linear-gradient(135deg, var(--purple-600), var(--purple-300));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem;
+}
+
+/* --- buttons ----------------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  font-weight: 600; border-radius: .75rem; padding: .6rem 1.1rem;
+  transition: transform .12s ease, box-shadow .15s ease, opacity .15s ease;
+  cursor: pointer; border: none;
+}
+.btn:active { transform: scale(.97); }
+.btn-primary {
+  color: #fff;
+  background: linear-gradient(135deg, var(--purple-700), var(--purple-500));
+  box-shadow: 0 10px 24px -12px rgba(109, 40, 217, .8);
+}
+.btn-primary:hover { box-shadow: 0 14px 30px -12px rgba(109, 40, 217, .95); }
+.btn-ghost { color: var(--purple-700); background: rgba(124, 58, 237, .08); }
+.btn-ghost:hover { background: rgba(124, 58, 237, .15); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.chip {
+  padding: .4rem .9rem; border-radius: 999px; font-weight: 600; font-size: .85rem;
+  background: rgba(124, 58, 237, .08); color: var(--purple-700); cursor: pointer;
+  white-space: nowrap; border: 1px solid transparent; transition: all .15s ease;
+}
+.chip.active { background: linear-gradient(135deg, var(--purple-700), var(--purple-500)); color: #fff; }
+
+.badge { font-size: .7rem; font-weight: 700; padding: .2rem .55rem; border-radius: 999px; }
+.badge-pending    { background: #fef3c7; color: #92400e; }
+.badge-confirmed  { background: #dbeafe; color: #1e40af; }
+.badge-preparing  { background: #ede9fe; color: #5b21b6; }
+.badge-ready      { background: #d1fae5; color: #065f46; }
+.badge-completed  { background: #e5e7eb; color: #374151; }
+.badge-cancelled  { background: #fee2e2; color: #991b1b; }
+
+/* --- inputs ------------------------------------------------------------ */
+.field {
+  width: 100%; padding: .7rem .9rem; border-radius: .75rem;
+  border: 1px solid rgba(124, 58, 237, .25); background: #fff; outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.field:focus { border-color: var(--purple-500); box-shadow: 0 0 0 3px rgba(139, 92, 246, .2); }
+
+/* --- cart / modal drawers --------------------------------------------- */
+.drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(30, 27, 46, .45);
+  opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 50;
+}
+.drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; right: 0; height: 100%; width: min(420px, 100%);
+  background: #fff; box-shadow: -20px 0 60px -30px rgba(30, 27, 46, .6);
+  transform: translateX(100%); transition: transform .25s ease; z-index: 60;
+  display: flex; flex-direction: column;
+}
+.drawer.open { transform: translateX(0); }
+
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(30, 27, 46, .5);
+  display: none; align-items: center; justify-content: center; z-index: 70; padding: 1rem;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: #fff; border-radius: 1.25rem; width: min(440px, 100%);
+  max-height: 92vh; overflow: auto; box-shadow: 0 30px 80px -30px rgba(30, 27, 46, .6);
+}
+
+/* --- toasts ------------------------------------------------------------ */
+.toast-host { position: fixed; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
+  z-index: 90; display: flex; flex-direction: column; gap: .5rem; align-items: center; }
+.toast {
+  padding: .7rem 1.1rem; border-radius: .8rem; color: #fff; font-weight: 600;
+  box-shadow: 0 16px 40px -18px rgba(0,0,0,.5); opacity: 0; transform: translateY(10px);
+  transition: opacity .25s ease, transform .25s ease; max-width: 90vw;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast-info    { background: linear-gradient(135deg, var(--purple-700), var(--purple-500)); }
+.toast-success { background: linear-gradient(135deg, #059669, #34d399); }
+.toast-error   { background: linear-gradient(135deg, #dc2626, #f87171); }
+
+.cart-fab {
+  position: fixed; bottom: 1.2rem; right: 1.2rem; z-index: 40;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple-700), var(--purple-500));
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 18px 40px -16px rgba(109, 40, 217, .9); cursor: pointer; border: none;
+}
+.cart-fab .count {
+  position: absolute; top: -4px; right: -4px; background: var(--accent); color: var(--ink);
+  font-size: .75rem; font-weight: 800; min-width: 22px; height: 22px; border-radius: 999px;
+  display: flex; align-items: center; justify-content: center; padding: 0 5px;
+}
+.no-scroll { overflow: hidden; }
