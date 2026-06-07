@@ -375,6 +375,9 @@
   <script src="js/auth.js"></script>
   <script src="js/pwa.js"></script>
   <script>
+    // Always start at the top of the page on (re)load, not the restored position.
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.addEventListener('load', () => window.scrollTo(0, 0));
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
     }
