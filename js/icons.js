@@ -50,6 +50,8 @@
     money: P('<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>'),
     bank: P('<path d="M3 9 12 4l9 5"/><path d="M4 9v8M9 9v8M15 9v8M20 9v8"/><path d="M3 20h18"/>'),
     card: P('<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 9.5h19"/><path d="M6 14.5h4"/>'),
+    store: P('<path d="M4 9.5 5.2 5h13.6L20 9.5"/><path d="M4 9.5h16v9.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 20v-5h6v5"/>'),
+    image: P('<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5L5 20"/>'),
   };
 
   window.ICON = (name, cls) => {

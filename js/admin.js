@@ -121,13 +121,19 @@
     const host = document.getElementById('menu-list');
     host.innerHTML = PRODUCTS.map((p) => {
       const sale = p.sale_price && Number(p.sale_price) > 0 && Number(p.sale_price) < Number(p.price);
+      const thumb = p.image_url
+        ? `<img src="${esc(p.image_url)}" alt="" class="w-14 h-14 rounded-lg object-cover shrink-0">`
+        : `<div class="thumb-fallback w-14 h-14 rounded-lg text-white shrink-0">${ICON('roll')}</div>`;
       return `
       <div class="card p-4 flex items-center justify-between gap-3 ${p.available ? '' : 'opacity-60'}">
-        <div class="min-w-0">
-          <p class="font-bold text-gray-800 truncate">${esc(p.name)}</p>
-          <p class="text-xs text-gray-400">${catName(p.category_id)} · ${sale ? `<span class="text-emerald-600">${money(p.sale_price)}</span> <span class="line-through">${money(p.price)}</span>` : money(p.price)} ${p.available ? '' : '· Sold out'}</p>
+        <div class="flex items-center gap-3 min-w-0">
+          ${thumb}
+          <div class="min-w-0">
+            <p class="font-bold text-gray-800 truncate">${esc(p.name)}</p>
+            <p class="text-xs text-gray-400">${catName(p.category_id)} · ${sale ? `<span class="text-emerald-600">${money(p.sale_price)}</span> <span class="line-through">${money(p.price)}</span>` : money(p.price)} ${p.available ? '' : '· Sold out'}</p>
+          </div>
         </div>
-        <button class="btn btn-ghost text-sm" data-edit="${p.id}"><span class="icon" data-icon="edit"></span></button>
+        <button class="btn btn-ghost text-sm shrink-0" data-edit="${p.id}"><span class="icon" data-icon="edit"></span></button>
       </div>`;
     }).join('');
     host.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => openProduct(PRODUCTS.find((x) => x.id === +b.dataset.edit))));
@@ -141,7 +147,33 @@
     f.category_id.value = p?.category_id || (CATEGORIES[0]?.id ?? '');
     f.description.value = p?.description || ''; f.price.value = p?.price ?? '';
     f.sale_price.value = p?.sale_price ?? ''; f.available.value = String(p?.available ?? true);
-    f.image_url.value = p?.image_url || ''; openModal('product-modal');
+    f.image_url.value = p?.image_url || '';
+    document.getElementById('product-photo-file').value = '';
+    renderPhotoPreview(p?.image_url || '');
+    openModal('product-modal');
+  }
+  function renderPhotoPreview(url) {
+    const box = document.getElementById('product-photo-preview');
+    box.innerHTML = url ? `<img src="${esc(url)}" alt="" class="w-full h-full object-cover">` : ICON('image');
+    injectIcons(box);
+  }
+  async function uploadProductPhoto(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const status = document.getElementById('product-photo-status');
+    status.textContent = 'Uploading…'; status.className = 'text-xs text-purple-600 mt-1';
+    try {
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const path = `products/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error } = await sb.storage.from('menu').upload(path, file, { upsert: true, contentType: file.type });
+      if (error) throw error;
+      const { data } = sb.storage.from('menu').getPublicUrl(path);
+      document.getElementById('product-form').image_url.value = data.publicUrl;
+      renderPhotoPreview(data.publicUrl);
+      status.textContent = 'Photo uploaded.'; status.className = 'text-xs text-emerald-600 mt-1';
+    } catch (err) {
+      status.textContent = err.message || 'Upload failed'; status.className = 'text-xs text-red-600 mt-1';
+    }
   }
   async function saveProduct(e) {
     e.preventDefault(); const f = e.target;
@@ -450,6 +482,7 @@
     document.getElementById('product-close').addEventListener('click', () => closeModal('product-modal'));
     document.getElementById('product-form').addEventListener('submit', saveProduct);
     document.getElementById('product-delete').addEventListener('click', deleteProduct);
+    document.getElementById('product-photo-file').addEventListener('change', uploadProductPhoto);
     // categories
     document.getElementById('add-category').addEventListener('click', () => openCategory(null));
     document.getElementById('category-close').addEventListener('click', () => closeModal('category-modal'));

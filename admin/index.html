@@ -22,7 +22,7 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <a href="../index.html" class="btn btn-ghost !text-white !bg-white/15 text-sm">View store</a>
+        <a href="../index.html" target="_blank" rel="noopener" class="btn btn-ghost !text-white !bg-white/15 text-sm"><span class="icon" data-icon="store"></span> Preview store</a>
         <button id="admin-logout" class="btn btn-ghost !text-white !bg-white/15 text-sm hidden"><span class="icon" data-icon="logout"></span> Logout</button>
       </div>
     </div>
@@ -193,8 +193,17 @@
           <div><label class="text-xs font-semibold text-gray-500">Available</label>
             <select name="available" class="field mt-1"><option value="true">Yes</option><option value="false">No</option></select></div>
         </div>
-        <div><label class="text-xs font-semibold text-gray-500">Image URL (optional)</label>
-          <input name="image_url" class="field mt-1" placeholder="https://…" /></div>
+        <div>
+          <label class="text-xs font-semibold text-gray-500">Product photo</label>
+          <div class="flex items-center gap-3 mt-1">
+            <div id="product-photo-preview" class="thumb-fallback w-16 h-16 rounded-lg text-white shrink-0 overflow-hidden"></div>
+            <div class="flex-1">
+              <input type="file" id="product-photo-file" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-purple-100 file:text-purple-700 file:font-semibold file:cursor-pointer" />
+              <p id="product-photo-status" class="text-xs text-gray-400 mt-1">JPG/PNG, uploaded to your store.</p>
+            </div>
+          </div>
+          <input name="image_url" class="field mt-2 text-xs" placeholder="…or paste an image URL" />
+        </div>
         <div class="flex gap-2 pt-1">
           <button type="submit" class="btn btn-primary flex-1 py-3">Save</button>
           <button type="button" id="product-delete" class="btn btn-ghost !text-red-600 !bg-red-50 hidden"><span class="icon" data-icon="trash"></span></button>

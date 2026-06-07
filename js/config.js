@@ -5,7 +5,7 @@
  * 1. Create a project at https://supabase.com
  * 2. Run the SQL in supabase/migrations/0001_init.sql in the SQL editor
  * 3. Copy "Project URL" and the "anon public" API key from
- *    Project Settings → API and paste them here.
+ *    Project Settings -> API and paste them here.
  *
  * The anon key is safe to expose in a static site: all access is guarded
  * by Row Level Security (RLS) policies defined in the migration.
