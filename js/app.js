@@ -488,18 +488,48 @@
   window.closeAccount = () => document.getElementById('account-modal').classList.remove('open');
 
   // ---- live order notifications (status changes) --------------------------
-  function notifyOrder(o) {
-    const msg = o.status === 'cancelled'
+  const SNAP_KEY = 'trr_order_snap';
+  const snapRead = () => { try { return JSON.parse(localStorage.getItem(SNAP_KEY)) || {}; } catch { return {}; } };
+  const snapSet = (id, status) => { const s = snapRead(); s[id] = status; localStorage.setItem(SNAP_KEY, JSON.stringify(s)); };
+
+  function orderMsg(o) {
+    return o.status === 'cancelled'
       ? I18N.t('notify.cancelled').replace('{n}', o.order_number)
       : I18N.t('notify.status').replace('{n}', o.order_number).replace('{s}', I18N.t('status.' + o.status));
-    showToast(msg, o.status === 'cancelled' ? 'error' : 'success');
-    pushNotif(msg);
+  }
+  function browserNotif(msg, id) {
     try {
       if (window.Notification && Notification.permission === 'granted') {
-        new Notification(cfg.SHOP_NAME, { body: msg, icon: 'assets/icons/icon-192.png', tag: 'trr-order-' + o.id });
+        new Notification(cfg.SHOP_NAME, { body: msg, icon: 'assets/icons/icon-192.png', tag: 'trr-order-' + id });
       }
     } catch (e) { /* ignore */ }
+  }
+  function notifyOrder(o) {
+    const msg = orderMsg(o);
+    showToast(msg, o.status === 'cancelled' ? 'error' : 'success');
+    pushNotif(msg);
+    browserNotif(msg, o.id);
+    snapSet(o.id, o.status);
     if (document.getElementById('account-modal')?.classList.contains('open')) openAccount();
+  }
+
+  // Catch up on status changes that happened while the app was closed.
+  async function reconcileOrderNotifs(userId) {
+    const { data: orders } = await sb.from('orders')
+      .select('id, order_number, status').eq('customer_id', userId)
+      .order('created_at', { ascending: false }).limit(30);
+    if (!orders) return;
+    const snap = snapRead();
+    const seeded = Object.keys(snap).length > 0;
+    orders.forEach((o) => {
+      if (seeded && snap[o.id] && snap[o.id] !== o.status) {
+        const msg = orderMsg(o);
+        pushNotif(msg);
+        browserNotif(msg, o.id);
+      }
+      snap[o.id] = o.status;
+    });
+    localStorage.setItem(SNAP_KEY, JSON.stringify(snap));
   }
 
   // ---- notification center (bell) ----------------------------------------
@@ -544,16 +574,23 @@
   }
   window.openNotif = openNotif;
 
-  window.subscribeMyOrders = function (userId) {
-    if (!window.sb || !userId || window._myOrdersChannel) return;
+  window.subscribeMyOrders = async function (userId) {
+    if (!window.sb || !userId) return;
+    // Authenticate the realtime socket so RLS lets this user receive their rows.
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session && sb.realtime && sb.realtime.setAuth) sb.realtime.setAuth(session.access_token);
+    } catch (e) { /* ignore */ }
+    // catch up on anything missed while away
+    reconcileOrderNotifs(userId);
+    if (window._myOrdersChannel) return;
     window._myOrdersChannel = sb.channel('my-orders-' + userId)
       .on('postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'orders', filter: 'customer_id=eq.' + userId },
         (payload) => {
           const o = payload.new;
           if (!o) return;
-          // only notify when the order status actually changes
-          if (payload.old && payload.old.status === o.status) return;
+          if (payload.old && payload.old.status === o.status) return; // status unchanged
           notifyOrder(o);
         })
       .subscribe();
@@ -583,6 +620,8 @@
     document.querySelectorAll('[data-shop-name]').forEach((el) => (el.textContent = cfg.SHOP_NAME));
     document.querySelectorAll('[data-shop-tagline]').forEach((el) => (el.textContent = cfg.SHOP_TAGLINE));
 
+    if (window.SHOP_OPEN === undefined) window.SHOP_OPEN = true; // optimistic default
+    applyShopStatus();
     loadMenu();
     renderCart();
     renderNotifBadge();
