@@ -114,9 +114,11 @@
     document.getElementById('auth-form')?.addEventListener('submit', submitAuth);
     document.getElementById('logout-btn')?.addEventListener('click', doLogout);
     refreshAuthUI();
-    // Opened from the admin page when not signed in → prompt sign-in.
+    // Opened from the admin page when not signed in → prompt sign-in once,
+    // then strip the param so a refresh lands on the clean main page.
     if (new URLSearchParams(location.search).get('signin')) {
       getSession().then((s) => { if (!s) openAuth(true); });
+      history.replaceState({}, '', location.pathname + location.hash);
     }
   });
 })();

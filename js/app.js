@@ -90,6 +90,15 @@
 
   async function loadMenu() {
     if (window.TRR_CONFIGURED && window.sb) {
+      // Instant paint from cache, then refresh from the network.
+      try {
+        const c = JSON.parse(localStorage.getItem('trr_menu_cache') || 'null');
+        if (c && c.products && c.products.length) {
+          CATEGORIES = c.categories || []; PRODUCTS = c.products; PROMOS = c.promos || [];
+          renderCategories(); renderProducts();
+        }
+      } catch (e) { /* ignore */ }
+
       const [{ data: cats }, { data: prods }, { data: promos }] = await Promise.all([
         sb.from('categories').select('*').eq('active', true).order('sort_order'),
         sb.from('products').select('*').order('sort_order'),
@@ -98,6 +107,7 @@
       CATEGORIES = cats || [];
       PRODUCTS = prods || [];
       PROMOS = promos || [];
+      try { localStorage.setItem('trr_menu_cache', JSON.stringify({ categories: CATEGORIES, products: PRODUCTS, promos: PROMOS })); } catch (e) {}
       loadSettings();
       loadAnnouncements();
     } else {
