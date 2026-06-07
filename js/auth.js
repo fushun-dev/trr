@@ -100,6 +100,10 @@
       userBox?.classList.add('hidden');
       langToggle?.classList.remove('hidden');
     }
+    // Storefront becomes read-only when an admin is browsing it (preview mode).
+    window.IS_ADMIN = isAdmin;
+    document.body.classList.toggle('admin-preview', isAdmin);
+    document.getElementById('admin-preview-bar')?.classList.toggle('hidden', !isAdmin);
   }
   window.refreshAuthUI = refreshAuthUI;
 

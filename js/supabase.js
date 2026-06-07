@@ -5,17 +5,11 @@
 (function () {
   const cfg = window.TRR_CONFIG;
 
-  // Separate auth storage for the admin dashboard vs the storefront, so a staff
-  // login and a buyer login can coexist in the same browser (different tabs)
-  // without overwriting each other's session.
-  const isAdmin = location.pathname.indexOf('/admin') !== -1;
-  const storageKey = isAdmin ? 'trr-admin-auth' : 'trr-store-auth';
-
-  // Initialise the client only when configured. Pages still render a demo
-  // menu when credentials are absent so the site is previewable on GitHub Pages.
+  // One shared session across the dashboard and storefront, so signing in as
+  // admin flows straight to the dashboard and "Preview store" stays signed in.
   window.sb = window.TRR_CONFIGURED
     ? supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
-        auth: { storageKey, persistSession: true, autoRefreshToken: true },
+        auth: { persistSession: true, autoRefreshToken: true },
       })
     : null;
 

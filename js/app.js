@@ -258,6 +258,7 @@
 
   // ---- checkout (sign-in required) ----------------------------------------
   async function openCheckout() {
+    if (window.IS_ADMIN) return showToast(I18N.t('toast.preview'), 'info');
     if (window.SHOP_OPEN === false) return showToast(I18N.t('toast.closed'), 'error');
     if (!Cart.count()) return showToast(I18N.t('toast.empty'), 'error');
 

@@ -184,6 +184,11 @@ body {
 }
 .no-scroll { overflow: hidden; }
 
+/* admin preview: hide buyer actions (cart, notifications, add-to-cart) */
+body.admin-preview #open-cart,
+body.admin-preview #notif-fab,
+body.admin-preview [data-add] { display: none !important; }
+
 /* profile dropdown menu */
 .profile-menu {
   position: absolute; right: 0; top: calc(100% + 8px); z-index: 70;
