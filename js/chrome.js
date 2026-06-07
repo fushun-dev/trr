@@ -13,8 +13,8 @@
           <span class="icon icon-lg" data-icon="roll"></span>
         </div>
         <div class="leading-tight">
-          <p class="font-extrabold text-gray-800" data-shop-name>Taiwan Rice Roll</p>
-          <p class="text-[11px] text-purple-600 font-medium">Jalan Luak · Miri</p>
+          <p class="font-extrabold text-gray-800 brand-name">Taiwan Rice Roll</p>
+          <p class="text-[11px] text-purple-600 font-medium hidden sm:block">Jalan Luak · Miri</p>
         </div>
       </a>
       <div class="flex items-center gap-1.5">
@@ -96,13 +96,13 @@
           <input type="checkbox" id="for-self" name="for_self" checked class="w-4 h-4 accent-purple-600" />
           <span class="text-sm font-semibold text-gray-700" data-i18n="co.forself">Ordering for myself</span>
         </label>
-        <div id="self-wrap" class="grid grid-cols-2 gap-3">
+        <div id="self-wrap" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div><label class="text-xs font-semibold text-gray-500" data-i18n="co.yourname">Your name</label><input name="name" class="field mt-1" data-i18n-ph="ph.yourname" placeholder="Your name" /></div>
           <div><label class="text-xs font-semibold text-gray-500" data-i18n="co.yourphone">Your phone</label><input name="phone" class="field mt-1" data-i18n-ph="ph.phone" placeholder="01x-xxxxxxx" /></div>
         </div>
         <div id="recipient-wrap" class="hidden space-y-3">
           <div class="flex items-center gap-2 text-purple-700 text-xs font-semibold"><span class="icon" data-icon="user"></span> <span data-i18n="co.deliverto">Deliver to / pickup by</span></div>
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div><label class="text-xs font-semibold text-gray-500" data-i18n="co.rname">Recipient name</label><input name="recipient_name" class="field mt-1" data-i18n-ph="co.rname" placeholder="Recipient's name" /></div>
             <div><label class="text-xs font-semibold text-gray-500" data-i18n="co.rphone">Recipient phone</label><input name="recipient_phone" class="field mt-1" data-i18n-ph="ph.phone" placeholder="01x-xxxxxxx" /></div>
           </div>

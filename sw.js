@@ -1,6 +1,6 @@
 /* Taiwan Rice Roll PWA service worker.
    Network-first for HTML/CSS/JS (always fresh), cache-first for other assets. */
-const CACHE = 'trr-v15';
+const CACHE = 'trr-v16';
 const ASSETS = [
   './',
   './index.html',

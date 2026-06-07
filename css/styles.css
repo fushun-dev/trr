@@ -221,6 +221,20 @@ body {
 /* reserve space so the persistent banner never covers page content */
 body.has-install-banner { padding-bottom: 88px; }
 
+/* --- mobile optimizations --------------------------------------------- */
+@media (max-width: 640px) {
+  .btn { padding: .5rem .75rem; font-size: .85rem; }
+  .modal { padding: 1.15rem !important; border-radius: 1.1rem; max-height: 90vh; }
+  .hero .max-w-5xl, .hero .max-w-3xl { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+  header .max-w-5xl { padding-left: .75rem; padding-right: .75rem; }
+  /* keep the header on one line */
+  .brand-name { max-width: 8.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+@media (max-width: 400px) {
+  .btn { padding: .5rem .6rem; }
+  .install-banner .btn-primary { padding-left: 1rem; padding-right: 1rem; }
+}
+
 /* iOS add-to-home-screen sheet */
 .ios-sheet-backdrop {
   position: fixed; inset: 0; background: rgba(30,27,46,.5); z-index: 80;
