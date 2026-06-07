@@ -504,32 +504,27 @@
       }
     } catch (e) { /* ignore */ }
   }
-  function notifyOrder(o) {
+  // Notify once per real status change (deduped via the saved snapshot).
+  function maybeNotify(o, withToast) {
+    const snap = snapRead();
+    if (snap[o.id] === o.status) return;            // already seen this status
+    const known = Object.prototype.hasOwnProperty.call(snap, o.id);
+    snapSet(o.id, o.status);
+    if (!known) return;                             // first sighting — just record
     const msg = orderMsg(o);
-    showToast(msg, o.status === 'cancelled' ? 'error' : 'success');
+    if (withToast) showToast(msg, o.status === 'cancelled' ? 'error' : 'success');
     pushNotif(msg);
     browserNotif(msg, o.id);
-    snapSet(o.id, o.status);
     if (document.getElementById('account-modal')?.classList.contains('open')) openAccount();
   }
 
-  // Catch up on status changes that happened while the app was closed.
-  async function reconcileOrderNotifs(userId) {
+  // Reliable fallback to realtime: poll the user's orders and notify on changes.
+  async function pollOrders(userId, withToast) {
     const { data: orders } = await sb.from('orders')
       .select('id, order_number, status').eq('customer_id', userId)
       .order('created_at', { ascending: false }).limit(30);
     if (!orders) return;
-    const snap = snapRead();
-    const seeded = Object.keys(snap).length > 0;
-    orders.forEach((o) => {
-      if (seeded && snap[o.id] && snap[o.id] !== o.status) {
-        const msg = orderMsg(o);
-        pushNotif(msg);
-        browserNotif(msg, o.id);
-      }
-      snap[o.id] = o.status;
-    });
-    localStorage.setItem(SNAP_KEY, JSON.stringify(snap));
+    orders.forEach((o) => maybeNotify(o, withToast));
   }
 
   // ---- notification center (bell) ----------------------------------------
@@ -581,18 +576,16 @@
       const { data: { session } } = await sb.auth.getSession();
       if (session && sb.realtime && sb.realtime.setAuth) sb.realtime.setAuth(session.access_token);
     } catch (e) { /* ignore */ }
-    // catch up on anything missed while away
-    reconcileOrderNotifs(userId);
+
+    pollOrders(userId, false);                      // seed + catch up on missed changes
+    if (window._notifPoll) clearInterval(window._notifPoll);
+    window._notifPoll = setInterval(() => pollOrders(userId, true), 20000); // reliable polling
+
     if (window._myOrdersChannel) return;
     window._myOrdersChannel = sb.channel('my-orders-' + userId)
       .on('postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'orders', filter: 'customer_id=eq.' + userId },
-        (payload) => {
-          const o = payload.new;
-          if (!o) return;
-          if (payload.old && payload.old.status === o.status) return; // status unchanged
-          notifyOrder(o);
-        })
+        (payload) => { if (payload.new) maybeNotify(payload.new, true); })
       .subscribe();
   };
   // Ask for notification permission (called from a user gesture, e.g. checkout).
