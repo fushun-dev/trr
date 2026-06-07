@@ -53,6 +53,7 @@
       'guide.s3': 'Choose pickup or delivery, enter a promo code if you have one, then place your order.',
       'guide.s4': 'Track your order under My orders. Earn 1 loyalty point per RM 1 once an order is completed.',
       'guide.s5': 'Tip: tap Install to add the app to your home screen for quick access.',
+      'guide.how_title': 'How to order', 'guide.status_title': 'Order status guide',
       // ---- admin / staff dashboard ----
       'a.dashboard': 'Staff Dashboard', 'a.preview': 'Preview store', 'a.logout': 'Logout',
       'a.signin_title': 'Staff sign in', 'a.signin_sub': 'Admin accounts only.', 'a.signin_btn': 'Sign in',
@@ -153,6 +154,7 @@
       'guide.s3': '选择自取或外送，如有优惠码可输入，然后提交订单。',
       'guide.s4': '在「我的订单」查看订单状态。订单完成后每消费 RM 1 获得 1 积分。',
       'guide.s5': '小贴士：点击「安装」将应用添加到主屏幕，方便快速下单。',
+      'guide.how_title': '如何下单', 'guide.status_title': '订单状态说明',
       // ---- admin / staff dashboard ----
       'a.dashboard': '员工后台', 'a.preview': '预览店面', 'a.logout': '退出',
       'a.signin_title': '员工登录', 'a.signin_sub': '仅限管理员账户。', 'a.signin_btn': '登录',
