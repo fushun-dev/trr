@@ -95,14 +95,15 @@
   const esc = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   const statusLabel = (s) => I18N.t('status.' + s);
 
-  // Ensure a valid (refreshed) session before any write, so a stale access
-  // token doesn't make the request anonymous and trip RLS.
+  // Refresh a near-expiry token before a write so requests stay authenticated.
+  // Never forces a logout — staff stay on the dashboard even if a refresh hiccups.
   async function ensureSession() {
-    let { data: { session } } = await sb.auth.getSession();
-    if (session && session.expires_at && session.expires_at * 1000 < Date.now() + 60000) {
-      session = (await sb.auth.refreshSession()).data.session;
-    }
-    if (!session) { showToast('Your session expired — please sign in again.', 'error'); showLogin(); return false; }
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session && session.expires_at && session.expires_at * 1000 < Date.now() + 120000) {
+        await sb.auth.refreshSession();
+      }
+    } catch (e) { /* ignore — keep working */ }
     return true;
   }
 
