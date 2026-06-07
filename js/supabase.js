@@ -109,4 +109,20 @@
       setTimeout(() => { input.focus(); input.select(); }, 30);
     });
   };
+
+  // ---- click-outside / Escape to close any modal or drawer ---------------
+  document.addEventListener('click', (e) => {
+    const t = e.target;
+    // close a modal when its backdrop (not its inner card) is clicked
+    if (t.classList && t.classList.contains('modal-backdrop') && t.classList.contains('open')) {
+      t.classList.remove('open');
+      document.body.classList.remove('no-scroll');
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.modal-backdrop.open, .drawer.open, .drawer-backdrop.open, .ios-sheet-backdrop.open')
+      .forEach((el) => el.classList.remove('open'));
+    document.body.classList.remove('no-scroll');
+  });
 })();
