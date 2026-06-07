@@ -114,5 +114,9 @@
     document.getElementById('auth-form')?.addEventListener('submit', submitAuth);
     document.getElementById('logout-btn')?.addEventListener('click', doLogout);
     refreshAuthUI();
+    // Opened from the admin page when not signed in → prompt sign-in.
+    if (new URLSearchParams(location.search).get('signin')) {
+      getSession().then((s) => { if (!s) openAuth(true); });
+    }
   });
 })();

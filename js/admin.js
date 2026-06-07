@@ -13,18 +13,18 @@
 
   // ---- auth gate ----------------------------------------------------------
   async function init() {
-    if (!window.TRR_CONFIGURED) { document.getElementById('config-warning').classList.remove('hidden'); return; }
+    if (!window.TRR_CONFIGURED) return;
     const profile = await getProfile();
     if (profile && profile.role === 'admin') showDashboard();
     else showLogin();
   }
+  // No separate staff login: admins sign in on the storefront, which redirects
+  // back here. Anyone not signed in as admin is sent to the storefront sign-in.
   function showLogin() {
-    document.getElementById('login-gate').classList.remove('hidden');
-    document.getElementById('dashboard').classList.add('hidden');
-    document.getElementById('admin-logout').classList.add('hidden');
+    window.location.replace('../index.html?signin=1');
   }
   async function showDashboard() {
-    document.getElementById('login-gate').classList.add('hidden');
+    document.getElementById('auth-redirect')?.classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
     document.getElementById('admin-logout').classList.remove('hidden');
     await loadCategories();
@@ -72,15 +72,6 @@
     showToast(next ? I18N.t('a.shop_open_now') : I18N.t('a.shop_closed_now'), next ? 'success' : 'info');
   }
 
-  async function login(e) {
-    e.preventDefault();
-    const f = e.target;
-    const { error } = await sb.auth.signInWithPassword({ email: f.email.value.trim(), password: f.password.value });
-    if (error) return showToast(error.message, 'error');
-    const profile = await getProfile();
-    if (!profile || profile.role !== 'admin') { await sb.auth.signOut(); return showToast(I18N.t('a.not_admin'), 'error'); }
-    showDashboard();
-  }
 
   // ---- shared -------------------------------------------------------------
   async function loadCategories() {
@@ -623,7 +614,6 @@
 
   // ---- wiring -------------------------------------------------------------
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('admin-login-form').addEventListener('submit', login);
     document.getElementById('admin-logout').addEventListener('click', async () => { await sb.auth.signOut(); showLogin(); });
     document.getElementById('shop-toggle').addEventListener('click', toggleShop);
     document.getElementById('lang-toggle')?.addEventListener('click', () => I18N.toggle());

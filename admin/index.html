@@ -29,21 +29,8 @@
     </div>
   </header>
 
-  <!-- Login gate -->
-  <div id="login-gate" class="max-w-sm mx-auto mt-16 px-4">
-    <div class="card p-6">
-      <h2 class="text-xl font-extrabold text-gray-800 mb-1" data-i18n="a.signin_title">Staff sign in</h2>
-      <p class="text-sm text-gray-500 mb-4" data-i18n="a.signin_sub">Admin accounts only.</p>
-      <form id="admin-login-form" class="space-y-3">
-        <input name="email" type="email" required class="field" data-i18n-ph="a.email" placeholder="Email" />
-        <input name="password" type="password" required class="field" data-i18n-ph="a.password" placeholder="Password" />
-        <button type="submit" class="btn btn-primary w-full py-3" data-i18n="a.signin_btn">Sign in</button>
-      </form>
-      <p id="config-warning" class="hidden mt-4 text-sm text-amber-700 bg-amber-50 rounded-lg p-3">
-        Supabase isn't configured yet. Add your keys in <code>js/config.js</code>.
-      </p>
-    </div>
-  </div>
+  <!-- Redirecting to the storefront sign-in for non-admins -->
+  <div id="auth-redirect" class="max-w-sm mx-auto mt-24 px-4 text-center text-gray-400">Redirecting to sign in…</div>
 
   <!-- Dashboard -->
   <main id="dashboard" class="hidden max-w-6xl mx-auto px-4 py-6">
