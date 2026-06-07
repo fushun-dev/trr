@@ -16,6 +16,13 @@
 
 * { -webkit-tap-highlight-color: transparent; }
 
+/* inline icons */
+.icon { display: inline-flex; align-items: center; justify-content: center; vertical-align: -0.15em; }
+.icon svg { width: 1em; height: 1em; display: block; }
+.icon-lg { font-size: 1.5rem; }
+.icon-xl { font-size: 2.25rem; }
+.btn .icon { font-size: 1.05em; }
+
 body {
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   color: var(--ink);
@@ -78,6 +85,8 @@ body {
 .btn-primary:hover { box-shadow: 0 14px 30px -12px rgba(109, 40, 217, .95); }
 .btn-ghost { color: var(--purple-700); background: rgba(124, 58, 237, .08); }
 .btn-ghost:hover { background: rgba(124, 58, 237, .15); }
+.btn-white { color: var(--purple-700); background: #fff; box-shadow: 0 10px 24px -12px rgba(0,0,0,.35); }
+.btn-white:hover { background: #fff; box-shadow: 0 14px 30px -12px rgba(0,0,0,.45); }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
 
 .chip {
@@ -154,26 +163,28 @@ body {
 }
 .no-scroll { overflow: hidden; }
 
-/* --- install-as-app banner -------------------------------------------- */
+/* --- install-as-app banner (full-width bottom bar, HSI-style) ---------- */
 .install-banner {
-  position: fixed; left: 50%; bottom: 1rem; transform: translate(-50%, 200%);
-  z-index: 45; width: min(560px, calc(100% - 1.5rem));
-  background: rgba(255,255,255,.97); backdrop-filter: blur(10px);
-  border: 1px solid rgba(124,58,237,.18); border-radius: 1rem;
-  box-shadow: 0 24px 60px -22px rgba(76,29,149,.6);
-  display: flex; align-items: center; gap: .85rem; padding: .8rem 1rem;
-  transition: transform .3s cubic-bezier(.2,.8,.2,1); opacity: 0;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 55;
+  background: #fff; border-top: 1px solid rgba(124,58,237,.15);
+  box-shadow: 0 -12px 40px -20px rgba(30,27,46,.45);
+  display: flex; align-items: center; gap: .85rem;
+  padding: .8rem 1rem; padding-bottom: max(.8rem, env(safe-area-inset-bottom));
+  transform: translateY(130%); transition: transform .32s cubic-bezier(.2,.8,.2,1);
 }
-.install-banner.show { transform: translate(-50%, 0); opacity: 1; }
+.install-banner.show { transform: translateY(0); }
+.install-banner .btn-primary { border-radius: 999px; padding-left: 1.4rem; padding-right: 1.4rem; }
 .install-banner .ib-icon {
-  width: 46px; height: 46px; border-radius: .8rem; flex-shrink: 0;
+  width: 44px; height: 44px; border-radius: .7rem; flex-shrink: 0; color: #fff;
   background: linear-gradient(135deg, var(--purple-700), var(--purple-500));
-  display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+  display: flex; align-items: center; justify-content: center;
 }
 .install-banner .ib-x {
-  background: none; border: none; color: #9ca3af; font-size: 1.4rem;
-  line-height: 1; cursor: pointer; padding: .2rem; align-self: flex-start;
+  background: none; border: none; color: #9ca3af; font-size: 1.5rem;
+  line-height: 1; cursor: pointer; padding: .2rem .4rem;
 }
+/* lift the mobile cart button above the banner when it's shown */
+.install-banner.show ~ .cart-fab { bottom: 5.5rem; }
 
 /* iOS add-to-home-screen sheet */
 .ios-sheet-backdrop {

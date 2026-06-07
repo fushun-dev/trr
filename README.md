@@ -11,15 +11,15 @@ gradient theme.
 
 ## Features
 
-- 🍙 **Storefront** — categorized menu (rice rolls, vegetarian, burritos, kefir,
+- **Storefront** — categorized menu (rice rolls, vegetarian, burritos, kefir,
   drinks, snacks), cart drawer, pickup/delivery checkout, WhatsApp order handoff.
-- 🛠️ **Admin dashboard** (`/admin`) — live order queue with status flow
+- **Admin dashboard** (`/admin`) — live order queue with status flow
   (pending → confirmed → preparing → ready → completed), daily sales stats, and
   full menu CRUD.
-- 🔐 **Auth** — optional customer accounts (order history) + admin-only dashboard,
+- **Auth** — optional customer accounts (order history) + admin-only dashboard,
   all enforced by Supabase Row Level Security.
-- 📱 **PWA** — installable, offline app shell via service worker.
-- 💜 Purple gradient theme, bilingual EN/中文 menu, RM pricing.
+- **PWA** — installable, offline app shell via service worker.
+-  Purple gradient theme, bilingual EN/中文 menu, RM pricing.
 
 ## Tech stack
 

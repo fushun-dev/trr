@@ -5,10 +5,12 @@
 (function () {
   let mode = 'login'; // 'login' | 'register'
 
-  window.openAuth = function () {
+  window.openAuth = function (requiredToOrder) {
     if (!requireConfig()) return;
     document.getElementById('auth-modal')?.classList.add('open');
-    setMode('login');
+    document.getElementById('auth-hint')?.classList.toggle('hidden', !requiredToOrder);
+    // ordering requires an account, so default newcomers to the sign-up view
+    setMode(requiredToOrder ? 'register' : 'login');
   };
   window.closeAuth = function () {
     document.getElementById('auth-modal')?.classList.remove('open');

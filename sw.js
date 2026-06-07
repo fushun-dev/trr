@@ -1,10 +1,11 @@
 /* Fan Tuan PWA service worker — cache-first for the app shell. */
-const CACHE = 'trr-v2';
+const CACHE = 'trr-v3';
 const ASSETS = [
   './',
   './index.html',
   './css/styles.css',
   './js/config.js',
+  './js/icons.js',
   './js/supabase.js',
   './js/cart.js',
   './js/app.js',

@@ -53,10 +53,9 @@
       deferredPrompt = null;
       if (outcome === 'accepted') hide();
       else dismiss();
-    } else if (isiOS()) {
-      document.getElementById('ios-install-sheet')?.classList.add('open');
     } else {
-      showToast?.('Use your browser menu → "Install app" / "Add to Home screen".', 'info');
+      // No native prompt available (iOS, or already-dismissed Chrome) — show steps.
+      document.getElementById('ios-install-sheet')?.classList.add('open');
     }
   }
 
@@ -68,9 +67,8 @@
       if (e.target.id === 'ios-install-sheet') hide();
     });
 
-    // iOS never fires beforeinstallprompt — show the banner proactively.
-    if (isiOS() && !isStandalone() && !recentlyDismissed()) {
-      setTimeout(show, 1500);
-    }
+    // Show the banner whenever the app isn't installed (HSI-style). On Android/
+    // desktop Chrome the native prompt may also arrive and wire up the button.
+    if (!isStandalone() && !recentlyDismissed()) setTimeout(show, 1200);
   });
 })();
