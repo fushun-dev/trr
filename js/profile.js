@@ -12,6 +12,12 @@
     for (const x of TIERS) if (points >= x.min) t = x;
     return { tier: t, next: TIERS.find((x) => x.min > points) };
   }
+  const STATUS_DOT = {
+    pending: 'bg-red-500', confirmed: 'bg-blue-500', preparing: 'bg-purple-500',
+    ready: 'bg-emerald-500', completed: 'bg-gray-400', cancelled: 'bg-gray-300',
+  };
+  const statusChip = (s) =>
+    `<span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full ${STATUS_DOT[s] || 'bg-gray-300'}"></span><span class="badge badge-${s}">${I18N.t('status.' + s)}</span></span>`;
   const stars = (n) =>
     Array.from({ length: 5 }, (_, i) => `<span class="${i < n ? 'text-amber-400' : 'text-gray-300'}">${ICON('sparkle')}</span>`).join('');
   const rateButtons = (id) =>
@@ -79,7 +85,7 @@
         <div class="border border-purple-50 rounded-xl p-3 mb-2 ord-${o.status}">
           <div class="flex items-center justify-between">
             <span class="font-bold text-gray-800 text-sm">${o.order_number}</span>
-            <span class="badge badge-${o.status}">${I18N.t('status.' + o.status)}</span>
+            ${statusChip(o.status)}
           </div>
           <p class="text-xs text-purple-600 mt-0.5">${I18N.t('sdesc.' + o.status)}</p>
           <p class="text-[11px] text-gray-400">${time}</p>
