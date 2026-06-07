@@ -29,8 +29,34 @@
     document.getElementById('admin-logout').classList.remove('hidden');
     await loadCategories();
     PRODUCTS = (await sb.from('products').select('*').order('sort_order')).data || [];
+    loadShopStatus();
     loadOrders();
     loaded.orders = true;
+  }
+
+  // ---- shop open / closed -------------------------------------------------
+  let shopOpen = true;
+  async function loadShopStatus() {
+    const { data } = await sb.from('settings').select('value').eq('key', 'shop_open').maybeSingle();
+    shopOpen = !data || data.value !== 'false';
+    renderShopStatus();
+  }
+  function renderShopStatus() {
+    document.getElementById('shop-status-dot').className = 'w-3 h-3 rounded-full ' + (shopOpen ? 'bg-emerald-500' : 'bg-red-500');
+    document.getElementById('shop-status-text').textContent = shopOpen
+      ? 'Open for orders — customers can order now.'
+      : 'Closed — customers cannot place orders.';
+    const btn = document.getElementById('shop-toggle');
+    btn.textContent = shopOpen ? 'Close shop' : 'Open shop';
+    btn.className = 'btn text-sm ' + (shopOpen ? 'btn-ghost !text-red-600 !bg-red-50' : 'btn-primary');
+  }
+  async function toggleShop() {
+    const next = !shopOpen;
+    const { error } = await sb.from('settings').upsert(
+      { key: 'shop_open', value: String(next), updated_at: new Date().toISOString() }, { onConflict: 'key' });
+    if (error) return showToast(error.message, 'error');
+    shopOpen = next; renderShopStatus();
+    showToast(next ? 'Shop is now OPEN' : 'Shop is now CLOSED', next ? 'success' : 'info');
   }
 
   async function login(e) {
@@ -525,6 +551,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('admin-login-form').addEventListener('submit', login);
     document.getElementById('admin-logout').addEventListener('click', async () => { await sb.auth.signOut(); showLogin(); });
+    document.getElementById('shop-toggle').addEventListener('click', toggleShop);
     document.getElementById('refresh-orders').addEventListener('click', loadOrders);
     document.getElementById('filter-status').addEventListener('change', loadOrders);
     document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => switchTab(b.dataset.tab)));

@@ -67,8 +67,17 @@
     if (m.whatsapp) cfg.WHATSAPP = m.whatsapp.replace(/[^0-9]/g, '');
     if (m.delivery_fee) cfg.DELIVERY_FEE = Number(m.delivery_fee);
     if (m.free_delivery_over) cfg.FREE_DELIVERY_OVER = Number(m.free_delivery_over);
+    window.SHOP_OPEN = m.shop_open !== 'false';
     document.querySelectorAll('[data-shop-name]').forEach((el) => (el.textContent = cfg.SHOP_NAME));
     document.querySelectorAll('[data-shop-tagline]').forEach((el) => (el.textContent = cfg.SHOP_TAGLINE));
+    applyShopStatus();
+  }
+  function applyShopStatus() {
+    const bar = document.getElementById('closed-banner');
+    if (!bar) return;
+    const closed = window.SHOP_OPEN === false;
+    bar.textContent = closed ? I18N.t('shop.closed_banner') : '';
+    bar.classList.toggle('hidden', !closed);
   }
 
   async function loadMenu() {
@@ -104,7 +113,7 @@
   function renderCategories() {
     const host = document.getElementById('category-chips');
     if (!host) return;
-    const chips = [{ id: 'all', name: 'All 全部' }, ...CATEGORIES];
+    const chips = [{ id: 'all', name: I18N.t('menu.all') }, ...CATEGORIES];
     host.innerHTML = chips
       .map((c) => `<button class="chip ${activeCat === c.id ? 'active' : ''}" data-cat="${c.id}">${c.name}</button>`)
       .join('');
@@ -122,7 +131,7 @@
     if (!host) return;
     const list = PRODUCTS.filter((p) => activeCat === 'all' || p.category_id === activeCat);
     if (!list.length) {
-      host.innerHTML = `<p class="text-center text-gray-400 col-span-full py-10">No items in this category yet.</p>`;
+      host.innerHTML = `<p class="text-center text-gray-400 col-span-full py-10">${I18N.t('menu.empty')}</p>`;
       return;
     }
     host.innerHTML = list
@@ -139,15 +148,15 @@
           : `<span class="font-extrabold brand-gradient-text text-lg">${money(eff)}</span>`;
         return `
           <div class="card overflow-hidden flex flex-col ${sold ? 'opacity-60' : ''}">
-            <div class="relative">${img}${onSale ? '<span class="badge badge-ready absolute top-2 left-2">Sale</span>' : ''}</div>
+            <div class="relative">${img}${onSale ? `<span class="badge badge-ready absolute top-2 left-2">${I18N.t('menu.sale')}</span>` : ''}</div>
             <div class="p-4 flex flex-col flex-1">
               <h3 class="font-bold text-gray-800 leading-snug">${p.name}</h3>
               <p class="text-sm text-gray-500 mt-1 flex-1">${p.description || ''}</p>
               <div class="flex items-center justify-between mt-3 gap-2">
                 <div>${priceHtml}</div>
                 ${sold
-                  ? `<span class="badge badge-cancelled">Sold out</span>`
-                  : `<button class="btn btn-primary text-sm shrink-0" data-add="${p.id}"><span class="icon" data-icon="plus"></span> Add</button>`}
+                  ? `<span class="badge badge-cancelled">${I18N.t('menu.soldout')}</span>`
+                  : `<button class="btn btn-primary text-sm shrink-0" data-add="${p.id}"><span class="icon" data-icon="plus"></span> ${I18N.t('menu.add')}</button>`}
               </div>
             </div>
           </div>`;
@@ -157,7 +166,7 @@
       btn.addEventListener('click', () => {
         const p = PRODUCTS.find((x) => x.id === Number(btn.dataset.add));
         Cart.add({ id: p.id, name: p.name, price: effectivePrice(p) });
-        showToast('Added to cart', 'success');
+        showToast(I18N.t('toast.added'), 'success');
       })
     );
     injectIcons(host);
@@ -180,7 +189,7 @@
     if (!items.length) {
       body.innerHTML = `<div class="text-center text-gray-300 py-16">
         <div class="text-5xl mb-3 flex justify-center">${ICON('cart')}</div>
-        <p class="text-gray-400">Your cart is empty</p></div>`;
+        <p class="text-gray-400">${I18N.t('cart.empty')}</p></div>`;
       footer?.classList.add('hidden');
       injectIcons(body);
       return;
@@ -231,13 +240,14 @@
 
   // ---- checkout (sign-in required) ----------------------------------------
   async function openCheckout() {
-    if (!Cart.count()) return showToast('Your cart is empty', 'error');
+    if (window.SHOP_OPEN === false) return showToast(I18N.t('toast.closed'), 'error');
+    if (!Cart.count()) return showToast(I18N.t('toast.empty'), 'error');
 
     // Strictly require a signed-up, signed-in user before ordering.
     if (window.TRR_CONFIGURED) {
       const profile = await getProfile();
       if (!profile) {
-        showToast('Please sign in to place your order', 'info');
+        showToast(I18N.t('toast.signin'), 'info');
         openAuth(true); // open auth with the "required to order" hint
         return;
       }
@@ -312,10 +322,11 @@
   async function placeOrder(e) {
     e.preventDefault();
     const form = e.target;
+    if (window.SHOP_OPEN === false) return showToast(I18N.t('toast.closed'), 'error');
 
     if (window.TRR_CONFIGURED) {
       const session = await getSession();
-      if (!session) { showToast('Please sign in to place your order', 'error'); openAuth(true); return; }
+      if (!session) { showToast(I18N.t('toast.signin'), 'error'); openAuth(true); return; }
     }
 
     const forSelf = form.for_self.checked;
@@ -421,7 +432,7 @@
     if (!profile) { openAuth(false); return; }
     document.getElementById('account-modal').classList.add('open');
     const body = document.getElementById('account-body');
-    body.innerHTML = `<p class="text-center text-gray-400 py-8">Loading…</p>`;
+    body.innerHTML = `<p class="text-center text-gray-400 py-8">${I18N.t('acct.loading')}</p>`;
 
     const pts = profile.loyalty_points || 0;
     const { tier, next } = tierFor(pts);
@@ -433,12 +444,12 @@
     const loyalty = `
       <div class="brand-gradient text-white rounded-2xl p-5 mb-4">
         <div class="flex items-center justify-between">
-          <div><p class="text-white/80 text-xs">Loyalty points</p><p class="text-3xl font-extrabold">${pts}</p></div>
-          <div class="text-right"><p class="text-white/80 text-xs">Tier</p><p class="text-xl font-extrabold">${tier.name}</p></div>
+          <div><p class="text-white/80 text-xs">${I18N.t('acct.points')}</p><p class="text-3xl font-extrabold">${pts}</p></div>
+          <div class="text-right"><p class="text-white/80 text-xs">${I18N.t('acct.tier')}</p><p class="text-xl font-extrabold">${tier.name}</p></div>
         </div>
-        ${next ? `<p class="text-white/80 text-xs mt-3">${toNext} more points to ${next.name}</p>` : `<p class="text-white/80 text-xs mt-3">Top tier reached. Thank you!</p>`}
+        ${next ? `<p class="text-white/80 text-xs mt-3">${toNext} ${I18N.t('acct.tonext')} ${next.name}</p>` : `<p class="text-white/80 text-xs mt-3">${I18N.t('acct.top')}</p>`}
       </div>
-      <p class="text-xs text-gray-400 mb-2">Earn 1 point per RM 1 spent when an order is completed.</p>`;
+      <p class="text-xs text-gray-400 mb-2">${I18N.t('acct.earn')}</p>`;
 
     const list = (orders || []).length ? orders.map((o) => {
       const items = (o.order_items || []).map((i) => `${i.quantity}× ${i.product_name}`).join(', ');
@@ -456,9 +467,9 @@
             <span class="text-xs">${stars}</span>
           </div>
         </div>`;
-    }).join('') : `<p class="text-center text-gray-400 py-6">No orders yet.</p>`;
+    }).join('') : `<p class="text-center text-gray-400 py-6">${I18N.t('acct.noorders')}</p>`;
 
-    body.innerHTML = loyalty + `<h4 class="font-bold text-gray-800 mb-2">Order history</h4>` + list;
+    body.innerHTML = loyalty + `<h4 class="font-bold text-gray-800 mb-2">${I18N.t('acct.history')}</h4>` + list;
     body.querySelectorAll('[data-rate]').forEach((b) =>
       b.addEventListener('click', () => submitRating(+b.dataset.order, +b.dataset.rate)));
     injectIcons(body);
@@ -468,7 +479,7 @@
   const renderStars = (n) =>
     Array.from({ length: 5 }, (_, i) => `<span class="${i < n ? 'text-amber-400' : 'text-gray-300'}">${ICON('sparkle')}</span>`).join('');
   const rateButtons = (orderId) =>
-    `<span class="text-gray-400 mr-1">Rate:</span>` +
+    `<span class="text-gray-400 mr-1">${I18N.t('acct.rate')}</span>` +
     Array.from({ length: 5 }, (_, i) =>
       `<button class="text-gray-300 hover:text-amber-400" data-rate="${i + 1}" data-order="${orderId}">${ICON('sparkle')}</button>`).join('');
 
@@ -499,6 +510,11 @@
     document.getElementById('coupon-apply')?.addEventListener('click', applyCoupon);
     document.getElementById('account-btn')?.addEventListener('click', openAccount);
     document.getElementById('account-close')?.addEventListener('click', closeAccount);
+    document.getElementById('lang-toggle')?.addEventListener('click', () => I18N.toggle());
+    document.addEventListener('lang:changed', () => {
+      renderCategories(); renderProducts(); renderCart(); refreshCheckoutTotals(); applyShopStatus();
+      if (document.getElementById('account-modal').classList.contains('open')) openAccount();
+    });
     document.getElementById('checkout-form')?.addEventListener('change', (e) => {
       if (e.target.name === 'fulfillment') refreshCheckoutTotals();
     });

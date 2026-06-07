@@ -20,13 +20,12 @@
   function setMode(m) {
     mode = m;
     const isReg = m === 'register';
-    document.getElementById('auth-title').textContent = isReg ? 'Create account' : 'Sign in';
+    const T = window.I18N ? I18N.t : (k) => k;
+    document.getElementById('auth-title').textContent = isReg ? T('auth.create') : T('auth.signin');
     document.getElementById('auth-name-wrap').classList.toggle('hidden', !isReg);
     document.getElementById('auth-phone-wrap').classList.toggle('hidden', !isReg);
-    document.getElementById('auth-submit').textContent = isReg ? 'Sign up' : 'Sign in';
-    document.getElementById('auth-toggle').textContent = isReg
-      ? 'Already have an account? Sign in'
-      : "New here? Create an account";
+    document.getElementById('auth-submit').textContent = isReg ? T('auth.create') : T('auth.signin');
+    document.getElementById('auth-toggle').textContent = isReg ? T('auth.to_login') : T('auth.to_register');
   }
   window.toggleAuthMode = () => setMode(mode === 'login' ? 'register' : 'login');
 
