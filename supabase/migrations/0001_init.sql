@@ -294,7 +294,7 @@ insert into public.settings (key, value) values
   ('shop_name',    'Taiwan Rice Roll 台湾紫米饭团'),
   ('shop_tagline', 'Authentic Taiwanese Purple Rice Rolls · Jalan Luak, Miri'),
   ('address',      'Jalan Luak, Miri, Sarawak'),
-  ('hours',        'Daily 8:00am – 6:00pm'),
+  ('hours',        'Daily 11:00am – 8:00pm'),
   ('delivery_fee', '5.00'),
   ('free_delivery_over', '50.00')
 on conflict (key) do nothing;
