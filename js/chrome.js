@@ -22,7 +22,7 @@
         <button id="login-btn" class="btn btn-primary text-sm whitespace-nowrap" data-i18n="nav.signin">Sign in</button>
         <div id="user-box" class="hidden flex items-center gap-1.5">
           <button id="account-btn" class="btn btn-ghost text-sm" aria-label="My orders" data-i18n-aria="nav.myorders"><span class="icon" data-icon="bag"></span></button>
-          <a id="admin-link" href="admin/index.html" class="btn btn-ghost text-sm hidden" aria-label="Admin" data-i18n-aria="nav.admin"><span class="icon" data-icon="gear"></span></a>
+          <a id="admin-link" href="admin/index.html" class="btn btn-ghost text-sm hidden" aria-label="Back to dashboard" data-i18n-aria="nav.admin"><span class="icon" data-icon="back"></span></a>
           <div class="relative">
             <button id="profile-btn" class="btn btn-ghost text-sm" aria-label="Profile"><span class="icon" data-icon="user"></span> <span class="icon text-xs" data-icon="chevron"></span></button>
             <div id="profile-menu" class="profile-menu hidden">
