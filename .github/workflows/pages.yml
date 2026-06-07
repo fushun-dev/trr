@@ -1,9 +1,10 @@
 name: Deploy to GitHub Pages
 
-# Publishes the static site whenever the development branch is updated.
+# Publishes the static site. Pages only deploys from the default branch,
+# so this runs on main only (feature-branch pushes were failing/cancelling).
 on:
   push:
-    branches: [claude/taiwanese-rice-roll-marketplace-NTtM2, main]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -13,7 +14,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
