@@ -104,13 +104,14 @@
   function renderOrders(orders) {
     const host = document.getElementById('orders-list');
     if (!orders.length) { host.innerHTML = `<p class="text-center text-gray-400 py-10">${I18N.t('a.noorders')}</p>`; return; }
-    host.innerHTML = orders.map((o) => {
+
+    const orderCard = (o) => {
       const items = (o.order_items || []).map((i) => `<li>${i.quantity}× ${i.product_name} <span class="text-gray-400">${money(i.line_total)}</span></li>`).join('');
       const time = new Date(o.created_at).toLocaleString('en-MY', { dateStyle: 'medium', timeStyle: 'short' });
       const ni = STATUS_FLOW.indexOf(o.status);
       const next = ni >= 0 && ni < STATUS_FLOW.length - 1 ? STATUS_FLOW[ni + 1] : null;
       return `
-      <div class="card p-4">
+      <div class="card p-4 ord-${o.status}">
         <div class="flex items-start justify-between gap-3">
           <div><p class="font-extrabold text-gray-800">${o.order_number}</p><p class="text-xs text-gray-400">${time}</p></div>
           <span class="badge badge-${o.status}">${statusLabel(o.status)}</span>
@@ -133,7 +134,33 @@
           ${o.status !== 'cancelled' && o.status !== 'completed' ? `<button class="btn btn-ghost !text-red-600 !bg-red-50 text-sm" data-cancel="${o.id}">${I18N.t('a.cancel')}</button>` : ''}
         </div>
       </div>`;
+    };
+
+    // Group by status; within each group, oldest first (first-come-first-served).
+    const groups = {};
+    orders.forEach((o) => { (groups[o.status] = groups[o.status] || []).push(o); });
+    Object.values(groups).forEach((arr) => arr.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+
+    const DISPLAY = ['pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled'];
+    const COLOR = {
+      pending:   { dot: 'bg-red-500',     text: 'text-red-600',     pulse: true },
+      confirmed: { dot: 'bg-blue-500',    text: 'text-blue-600' },
+      preparing: { dot: 'bg-purple-500',  text: 'text-purple-600' },
+      ready:     { dot: 'bg-emerald-500', text: 'text-emerald-600' },
+      completed: { dot: 'bg-gray-400',    text: 'text-gray-500' },
+      cancelled: { dot: 'bg-gray-300',    text: 'text-gray-400' },
+    };
+    host.innerHTML = DISPLAY.filter((st) => groups[st] && groups[st].length).map((st) => {
+      const c = COLOR[st];
+      return `<section class="mb-6">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="w-2.5 h-2.5 rounded-full ${c.dot} ${c.pulse ? 'dot-pulse' : ''}"></span>
+          <h3 class="font-extrabold ${c.text}">${statusLabel(st)} <span class="text-gray-400 font-semibold">(${groups[st].length})</span></h3>
+        </div>
+        <div class="space-y-3">${groups[st].map(orderCard).join('')}</div>
+      </section>`;
     }).join('');
+
     host.querySelectorAll('[data-advance]').forEach((b) => b.addEventListener('click', () => updateStatus(+b.dataset.advance, b.dataset.next)));
     host.querySelectorAll('[data-cancel]').forEach((b) => b.addEventListener('click', () => { if (confirm('Cancel this order?')) updateStatus(+b.dataset.cancel, 'cancelled'); }));
     host.querySelectorAll('[data-paid]').forEach((b) => b.addEventListener('click', () => markPaid(+b.dataset.paid)));

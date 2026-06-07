@@ -97,12 +97,22 @@ body {
 .chip.active { background: linear-gradient(135deg, var(--purple-700), var(--purple-500)); color: #fff; }
 
 .badge { font-size: .7rem; font-weight: 700; padding: .2rem .55rem; border-radius: 999px; }
-.badge-pending    { background: #fef3c7; color: #92400e; }
+.badge-pending    { background: #fee2e2; color: #dc2626; }
 .badge-confirmed  { background: #dbeafe; color: #1e40af; }
 .badge-preparing  { background: #ede9fe; color: #5b21b6; }
 .badge-ready      { background: #d1fae5; color: #065f46; }
 .badge-completed  { background: #e5e7eb; color: #374151; }
-.badge-cancelled  { background: #fee2e2; color: #991b1b; }
+.badge-cancelled  { background: #e5e7eb; color: #6b7280; }
+
+/* order status grouping: colored left accent on cards + urgency pulse */
+.ord-pending    { border-left: 4px solid #ef4444; }
+.ord-confirmed  { border-left: 4px solid #3b82f6; }
+.ord-preparing  { border-left: 4px solid #8b5cf6; }
+.ord-ready      { border-left: 4px solid #10b981; }
+.ord-completed  { border-left: 4px solid #9ca3af; }
+.ord-cancelled  { border-left: 4px solid #d1d5db; }
+@keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+.dot-pulse { animation: pulse-dot 1.2s ease-in-out infinite; }
 
 /* --- inputs ------------------------------------------------------------ */
 .field {
