@@ -79,11 +79,10 @@
       bar.textContent = closed ? I18N.t('shop.closed_banner') : '';
       bar.classList.toggle('hidden', !closed);
     }
-    const pill = document.getElementById('header-shop-status');
-    if (pill) {
-      // hidden on phones (the red banner covers the closed state); shown from sm up
-      pill.className = 'hidden sm:inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ' + (closed ? 'status-closed' : 'status-open');
-      pill.innerHTML = `<span class="w-2 h-2 rounded-full ${closed ? 'bg-red-500 dot-pulse' : 'bg-emerald-500'}"></span> ${closed ? I18N.t('hdr.closed') : I18N.t('hdr.open')}`;
+    const bs = document.getElementById('brand-status');
+    if (bs) {
+      bs.className = 'text-[11px] font-semibold flex items-center gap-1 ' + (closed ? 'text-red-600' : 'text-emerald-600');
+      bs.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${closed ? 'bg-red-500 dot-pulse' : 'bg-emerald-500'}"></span> ${closed ? I18N.t('hdr.closed') : I18N.t('hdr.open')}`;
     }
   }
   window.openGuide = () => document.getElementById('guide-modal').classList.add('open');

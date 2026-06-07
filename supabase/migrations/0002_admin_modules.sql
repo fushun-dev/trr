@@ -78,5 +78,5 @@ create policy "promo admin write" on public.promotions for all
 -- Seed: a friendly launch announcement (edit/delete in the admin dashboard)
 -- =============================================================================
 insert into public.announcements (title, body, active)
-select '🎉 Now ordering online!', 'Pickup & delivery across Miri — order ahead and skip the queue.', true
+select 'Now ordering online!', 'Pickup & delivery across Miri — order ahead and skip the queue.', true
 where not exists (select 1 from public.announcements);
