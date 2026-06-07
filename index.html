@@ -81,10 +81,62 @@
     <div class="card p-5"><div class="text-2xl mb-2">🛵</div><h3 class="font-bold text-gray-800">Pickup & delivery</h3><p class="text-sm text-gray-500 mt-1">Free delivery over RM 50</p></div>
   </section>
 
+  <!-- Visit us -->
+  <section class="max-w-5xl mx-auto px-4 pb-16">
+    <div class="card overflow-hidden md:flex">
+      <img src="assets/products/stall.jpg" alt="Taiwan Rice Roll stall"
+           class="w-full md:w-1/2 h-56 md:h-auto object-cover" loading="lazy" />
+      <div class="p-6 md:w-1/2 flex flex-col justify-center">
+        <h2 class="text-2xl font-extrabold text-gray-800">Visit us in Miri</h2>
+        <p class="text-gray-500 mt-2">
+          Look for our purple stall at <b>Jalan Luak</b>. Every rice roll is rolled
+          fresh to order — warm purple glutinous rice, crispy you tiao and your
+          favourite fillings. Order ahead and skip the wait!
+        </p>
+        <a href="#menu" class="btn btn-primary mt-4 self-start">Order now</a>
+      </div>
+    </div>
+  </section>
+
   <footer class="brand-gradient text-white/90 text-center py-6 text-sm">
     <p class="font-bold" data-shop-name>Taiwan Rice Roll 台湾紫米饭团</p>
     <p class="text-white/70 mt-1">Made with 💜 in Miri · <a href="admin/index.html" class="underline">Staff login</a></p>
   </footer>
+
+  <!-- Install-as-app banner -->
+  <div id="install-banner" class="install-banner">
+    <div class="ib-icon">🍙</div>
+    <div class="flex-1 min-w-0">
+      <p class="font-extrabold text-gray-800 text-sm leading-tight">Install our app</p>
+      <p class="text-xs text-gray-500">Add Taiwan Rice Roll to your home screen for 1-tap ordering.</p>
+    </div>
+    <button id="install-btn" class="btn btn-primary text-sm">Install</button>
+    <button id="install-dismiss" class="ib-x" aria-label="Dismiss">×</button>
+  </div>
+
+  <!-- iOS add-to-home-screen instructions -->
+  <div id="ios-install-sheet" class="ios-sheet-backdrop">
+    <div class="ios-sheet">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-extrabold text-gray-800 text-lg">Add to Home Screen</h3>
+        <button id="ios-sheet-close" class="text-gray-400 text-2xl leading-none">×</button>
+      </div>
+      <ol class="space-y-3 text-sm text-gray-600">
+        <li class="flex items-center gap-3">
+          <span class="ib-icon !w-9 !h-9 !text-base">⬆️</span>
+          Tap the <b>Share</b> button in Safari's toolbar.
+        </li>
+        <li class="flex items-center gap-3">
+          <span class="ib-icon !w-9 !h-9 !text-base">➕</span>
+          Choose <b>"Add to Home Screen"</b>.
+        </li>
+        <li class="flex items-center gap-3">
+          <span class="ib-icon !w-9 !h-9 !text-base">✅</span>
+          Tap <b>Add</b> — done! Open it like any app.
+        </li>
+      </ol>
+    </div>
+  </div>
 
   <!-- Floating cart button (mobile) -->
   <button id="cart-fab" class="cart-fab md:hidden">
@@ -215,6 +267,7 @@
   <script src="js/cart.js"></script>
   <script src="js/app.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/pwa.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));

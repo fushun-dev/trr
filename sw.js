@@ -1,5 +1,5 @@
 /* Fan Tuan PWA service worker — cache-first for the app shell. */
-const CACHE = 'trr-v1';
+const CACHE = 'trr-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
   './js/cart.js',
   './js/app.js',
   './js/auth.js',
+  './js/pwa.js',
   './manifest.json',
 ];
 
