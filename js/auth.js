@@ -9,8 +9,9 @@
     if (!requireConfig()) return;
     document.getElementById('auth-modal')?.classList.add('open');
     document.getElementById('auth-hint')?.classList.toggle('hidden', !requiredToOrder);
-    // ordering requires an account, so default newcomers to the sign-up view
-    setMode(requiredToOrder ? 'register' : 'login');
+    // Always open on the Sign in view; new users tap "Create an account".
+    setMode('login');
+    setTimeout(() => document.querySelector('#auth-form [name="email"]')?.focus(), 60);
   };
   window.closeAuth = function () {
     document.getElementById('auth-modal')?.classList.remove('open');
