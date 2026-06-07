@@ -382,7 +382,14 @@
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.addEventListener('load', () => window.scrollTo(0, 0));
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').then((reg) => {
+        reg.addEventListener('updatefound', () => {
+          const nw = reg.installing;
+          nw && nw.addEventListener('statechange', () => {
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) location.reload();
+          });
+        });
+      }).catch(() => {}));
     }
   </script>
 </body>

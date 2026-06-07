@@ -32,19 +32,81 @@
     loadShopStatus();
     loadOrders();
     loaded.orders = true;
-    subscribeRealtime();
+    await initMaxOrder();        // baseline so existing orders don't alert
+    enableAlertsOnInteraction(); // unlock sound + notifications on first tap
+    subscribeRealtime();         // realtime + 1-minute poll for new orders
   }
 
-  // Live updates: refresh the orders/payments views when any order changes.
+  // ---- new-order alerts (sound + vibrate + notification) -----------------
+  let audioCtx;
+  function enableAlerts() {
+    try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    try { if (window.Notification && Notification.permission === 'default') Notification.requestPermission(); } catch (e) {}
+  }
+  function playChime() {
+    if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; } }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const now = audioCtx.currentTime;
+    [880, 1175, 1568, 1175].forEach((f, i) => {
+      const t = now + i * 0.2;
+      const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.35, t + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+      o.connect(g).connect(audioCtx.destination);
+      o.start(t); o.stop(t + 0.2);
+    });
+  }
+  function newOrderAlert(o) {
+    showToast('New order — ' + o.order_number, 'success');
+    playChime();
+    try { if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]); } catch (e) {}
+    try {
+      if (window.Notification && Notification.permission === 'granted') {
+        new Notification('New order — ' + cfg.SHOP_NAME, {
+          body: o.order_number + ' · ' + money(o.total),
+          icon: '../assets/icons/icon-192.png', tag: 'neworder-' + o.id, requireInteraction: true,
+        });
+      }
+    } catch (e) {}
+  }
+
+  const refreshViews = () => {
+    const active = document.querySelector('[data-tab].active')?.dataset.tab;
+    if (!active || active === 'orders') loadOrders();
+    if (loaded.payments) loadPayments();
+  };
+  async function initMaxOrder() {
+    const { data } = await sb.from('orders').select('id').order('id', { ascending: false }).limit(1);
+    window._maxOrderId = data && data[0] ? data[0].id : 0;
+  }
+  // Detect new orders (works regardless of active tab) and alert once each.
+  async function checkNewOrders() {
+    const { data } = await sb.from('orders').select('id, order_number, total').order('id', { ascending: false }).limit(1);
+    if (!data || !data.length) return;
+    const top = data[0];
+    if (window._maxOrderId != null && top.id > window._maxOrderId) { newOrderAlert(top); window._maxOrderId = top.id; }
+  }
+
+  // Live updates via realtime + a 1-minute safety poll for new orders.
   function subscribeRealtime() {
-    if (window._trrRealtime) return;
-    window._trrRealtime = sb.channel('orders-rt')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-        const active = document.querySelector('[data-tab].active')?.dataset.tab;
-        if (!active || active === 'orders') loadOrders();
-        if (loaded.payments) loadPayments();
-      })
-      .subscribe();
+    sb.auth.getSession().then(({ data: { session } }) => {
+      if (session && sb.realtime && sb.realtime.setAuth) sb.realtime.setAuth(session.access_token);
+    });
+    if (!window._trrRealtime) {
+      window._trrRealtime = sb.channel('orders-rt')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, () => { checkNewOrders(); refreshViews(); })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, refreshViews)
+        .subscribe();
+    }
+    if (window._adminPoll) clearInterval(window._adminPoll);
+    window._adminPoll = setInterval(() => { checkNewOrders(); refreshViews(); }, 60000); // every minute
+  }
+  function enableAlertsOnInteraction() {
+    const h = () => { enableAlerts(); document.removeEventListener('click', h); document.removeEventListener('touchstart', h); };
+    document.addEventListener('click', h); document.addEventListener('touchstart', h, { passive: true });
   }
 
   // ---- shop open / closed -------------------------------------------------
@@ -614,7 +676,11 @@
 
   // ---- wiring -------------------------------------------------------------
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('admin-logout').addEventListener('click', async () => { await sb.auth.signOut(); showLogin(); });
+    document.getElementById('admin-logout').addEventListener('click', async () => {
+      if (window._adminPoll) clearInterval(window._adminPoll);
+      await sb.auth.signOut();
+      window.location.replace('../index.html');   // land on the main landing page
+    });
     document.getElementById('shop-toggle').addEventListener('click', toggleShop);
     document.getElementById('lang-toggle')?.addEventListener('click', () => I18N.toggle());
     document.addEventListener('lang:changed', () => {

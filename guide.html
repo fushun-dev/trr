@@ -111,7 +111,7 @@
       const wa = document.getElementById('wa-link');
       if (wa && cfg.WHATSAPP) wa.href = 'https://wa.me/' + String(cfg.WHATSAPP).replace(/[^0-9]/g, '');
     });
-    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').then((reg) => { reg.addEventListener('updatefound', () => { const nw = reg.installing; nw && nw.addEventListener('statechange', () => { if (nw.state === 'installed' && navigator.serviceWorker.controller) location.reload(); }); }); }).catch(() => {}));
   </script>
 </body>
 </html>
