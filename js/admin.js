@@ -153,10 +153,11 @@
     host.innerHTML = DISPLAY.filter((st) => groups[st] && groups[st].length).map((st) => {
       const c = COLOR[st];
       return `<section class="mb-6">
-        <div class="flex items-center gap-2 mb-2">
+        <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full ${c.dot} ${c.pulse ? 'dot-pulse' : ''}"></span>
           <h3 class="font-extrabold ${c.text}">${statusLabel(st)} <span class="text-gray-400 font-semibold">(${groups[st].length})</span></h3>
         </div>
+        <p class="text-xs text-gray-400 mb-2 ml-[18px]">${I18N.t('sdesc.' + st)}</p>
         <div class="space-y-3">${groups[st].map(orderCard).join('')}</div>
       </section>`;
     }).join('');

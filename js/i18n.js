@@ -94,6 +94,9 @@
       'a.optional': 'optional', 'a.paid': 'paid', 'a.unpaid': 'unpaid',
       'status.pending': 'pending', 'status.confirmed': 'confirmed', 'status.preparing': 'preparing',
       'status.ready': 'ready', 'status.completed': 'completed', 'status.cancelled': 'cancelled',
+      'sdesc.pending': 'Order successfully made', 'sdesc.confirmed': 'Order is received',
+      'sdesc.preparing': 'Order is being prepared', 'sdesc.ready': 'Ready to pick up / delivery',
+      'sdesc.completed': 'Order is completed', 'sdesc.cancelled': 'Order was cancelled',
     },
     zh: {
       'nav.signin': '登录', 'nav.myorders': '我的订单', 'nav.admin': '管理', 'nav.cart': '购物车',
@@ -183,6 +186,9 @@
       'a.optional': '可选', 'a.paid': '已付', 'a.unpaid': '未付',
       'status.pending': '待处理', 'status.confirmed': '已确认', 'status.preparing': '制作中',
       'status.ready': '可取餐', 'status.completed': '已完成', 'status.cancelled': '已取消',
+      'sdesc.pending': '订单已成功提交', 'sdesc.confirmed': '订单已接收',
+      'sdesc.preparing': '订单正在准备中', 'sdesc.ready': '可取餐 / 外送',
+      'sdesc.completed': '订单已完成', 'sdesc.cancelled': '订单已取消',
     },
   };
 
