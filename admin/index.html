@@ -17,13 +17,14 @@
       <div class="flex items-center gap-2">
         <div class="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center"><span class="icon icon-lg" data-icon="roll"></span></div>
         <div class="leading-tight">
-          <p class="font-extrabold">Staff Dashboard</p>
+          <p class="font-extrabold" data-i18n="a.dashboard">Staff Dashboard</p>
           <p class="text-[11px] text-white/70" data-shop-name>Taiwan Rice Roll</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <a href="../index.html" target="_blank" rel="noopener" class="btn btn-ghost !text-white !bg-white/15 text-sm"><span class="icon" data-icon="store"></span> <span class="hidden sm:inline">Preview store</span></a>
-        <button id="admin-logout" class="btn btn-ghost !text-white !bg-white/15 text-sm hidden" aria-label="Logout"><span class="icon" data-icon="logout"></span> <span class="hidden sm:inline">Logout</span></button>
+        <button id="lang-toggle" class="btn btn-ghost !text-white !bg-white/15 text-sm font-bold" aria-label="Language"><span class="icon" data-icon="globe"></span> <span data-lang-label>中文</span></button>
+        <a href="../index.html" target="_blank" rel="noopener" class="btn btn-ghost !text-white !bg-white/15 text-sm"><span class="icon" data-icon="store"></span> <span class="hidden sm:inline" data-i18n="a.preview">Preview store</span></a>
+        <button id="admin-logout" class="btn btn-ghost !text-white !bg-white/15 text-sm hidden" aria-label="Logout"><span class="icon" data-icon="logout"></span> <span class="hidden sm:inline" data-i18n="a.logout">Logout</span></button>
       </div>
     </div>
   </header>
@@ -31,12 +32,12 @@
   <!-- Login gate -->
   <div id="login-gate" class="max-w-sm mx-auto mt-16 px-4">
     <div class="card p-6">
-      <h2 class="text-xl font-extrabold text-gray-800 mb-1">Staff sign in</h2>
-      <p class="text-sm text-gray-500 mb-4">Admin accounts only.</p>
+      <h2 class="text-xl font-extrabold text-gray-800 mb-1" data-i18n="a.signin_title">Staff sign in</h2>
+      <p class="text-sm text-gray-500 mb-4" data-i18n="a.signin_sub">Admin accounts only.</p>
       <form id="admin-login-form" class="space-y-3">
-        <input name="email" type="email" required class="field" placeholder="Email" />
-        <input name="password" type="password" required class="field" placeholder="Password" />
-        <button type="submit" class="btn btn-primary w-full py-3">Sign in</button>
+        <input name="email" type="email" required class="field" data-i18n-ph="a.email" placeholder="Email" />
+        <input name="password" type="password" required class="field" data-i18n-ph="a.password" placeholder="Password" />
+        <button type="submit" class="btn btn-primary w-full py-3" data-i18n="a.signin_btn">Sign in</button>
       </form>
       <p id="config-warning" class="hidden mt-4 text-sm text-amber-700 bg-amber-50 rounded-lg p-3">
         Supabase isn't configured yet. Add your keys in <code>js/config.js</code>.
@@ -51,47 +52,47 @@
       <div class="flex items-center gap-3">
         <span id="shop-status-dot" class="w-3 h-3 rounded-full bg-gray-300"></span>
         <div>
-          <p class="font-bold text-gray-800">Shop status</p>
-          <p id="shop-status-text" class="text-sm text-gray-500">Loading…</p>
+          <p class="font-bold text-gray-800" data-i18n="a.shop_status">Shop status</p>
+          <p id="shop-status-text" class="text-sm text-gray-500" data-i18n="a.loading">Loading…</p>
         </div>
       </div>
       <button id="shop-toggle" class="btn btn-primary text-sm">Toggle</button>
     </div>
 
     <div id="tabbar" class="flex gap-2 mb-6 overflow-x-auto no-scrollbar scroll-fade pb-1">
-      <button class="chip active" data-tab="orders"><span class="icon" data-icon="box"></span> Orders</button>
-      <button class="chip" data-tab="menu"><span class="icon" data-icon="menu"></span> Menu</button>
-      <button class="chip" data-tab="categories"><span class="icon" data-icon="layers"></span> Categories</button>
-      <button class="chip" data-tab="promotions"><span class="icon" data-icon="tag"></span> Promotions</button>
-      <button class="chip" data-tab="coupons"><span class="icon" data-icon="ticket"></span> Coupons</button>
-      <button class="chip" data-tab="payments"><span class="icon" data-icon="money"></span> Payments</button>
-      <button class="chip" data-tab="announcements"><span class="icon" data-icon="megaphone"></span> Announcements</button>
-      <button class="chip" data-tab="customers"><span class="icon" data-icon="users"></span> Customers</button>
-      <button class="chip" data-tab="analytics"><span class="icon" data-icon="chart"></span> Analytics</button>
-      <button class="chip" data-tab="settings"><span class="icon" data-icon="gear"></span> Settings</button>
+      <button class="chip active" data-tab="orders"><span class="icon" data-icon="box"></span> <span data-i18n="a.t_orders">Orders</span></button>
+      <button class="chip" data-tab="menu"><span class="icon" data-icon="menu"></span> <span data-i18n="a.t_menu">Menu</span></button>
+      <button class="chip" data-tab="categories"><span class="icon" data-icon="layers"></span> <span data-i18n="a.t_categories">Categories</span></button>
+      <button class="chip" data-tab="promotions"><span class="icon" data-icon="tag"></span> <span data-i18n="a.t_promotions">Promotions</span></button>
+      <button class="chip" data-tab="coupons"><span class="icon" data-icon="ticket"></span> <span data-i18n="a.t_coupons">Coupons</span></button>
+      <button class="chip" data-tab="payments"><span class="icon" data-icon="money"></span> <span data-i18n="a.t_payments">Payments</span></button>
+      <button class="chip" data-tab="announcements"><span class="icon" data-icon="megaphone"></span> <span data-i18n="a.t_announcements">Announcements</span></button>
+      <button class="chip" data-tab="customers"><span class="icon" data-icon="users"></span> <span data-i18n="a.t_customers">Customers</span></button>
+      <button class="chip" data-tab="analytics"><span class="icon" data-icon="chart"></span> <span data-i18n="a.t_analytics">Analytics</span></button>
+      <button class="chip" data-tab="settings"><span class="icon" data-icon="gear"></span> <span data-i18n="a.t_settings">Settings</span></button>
     </div>
 
     <!-- Orders -->
     <section id="tab-orders">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-        <div class="card p-4"><p class="text-xs text-gray-500">Today's orders</p><p id="stat-today" class="text-2xl font-extrabold brand-gradient-text">0</p></div>
-        <div class="card p-4"><p class="text-xs text-gray-500">Pending</p><p id="stat-pending" class="text-2xl font-extrabold text-amber-600">0</p></div>
-        <div class="card p-4"><p class="text-xs text-gray-500">Preparing</p><p id="stat-preparing" class="text-2xl font-extrabold text-purple-600">0</p></div>
-        <div class="card p-4"><p class="text-xs text-gray-500">Today's sales</p><p id="stat-sales" class="text-2xl font-extrabold text-emerald-600">RM 0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500" data-i18n="a.st_today">Today's orders</p><p id="stat-today" class="text-2xl font-extrabold brand-gradient-text">0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500" data-i18n="a.st_pending">Pending</p><p id="stat-pending" class="text-2xl font-extrabold text-amber-600">0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500" data-i18n="a.st_preparing">Preparing</p><p id="stat-preparing" class="text-2xl font-extrabold text-purple-600">0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500" data-i18n="a.st_sales">Today's sales</p><p id="stat-sales" class="text-2xl font-extrabold text-emerald-600">RM 0</p></div>
       </div>
       <div class="flex items-center justify-between mb-3">
-        <h2 class="text-lg font-extrabold text-gray-800">Orders</h2>
+        <h2 class="text-lg font-extrabold text-gray-800" data-i18n="a.orders">Orders</h2>
         <div class="flex gap-2">
           <select id="filter-status" class="field !py-1.5 !w-auto text-sm">
-            <option value="">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="preparing">Preparing</option>
-            <option value="ready">Ready</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="" data-i18n="a.f_all">All statuses</option>
+            <option value="pending" data-i18n="a.f_pending">Pending</option>
+            <option value="confirmed" data-i18n="a.f_confirmed">Confirmed</option>
+            <option value="preparing" data-i18n="a.f_preparing">Preparing</option>
+            <option value="ready" data-i18n="a.f_ready">Ready</option>
+            <option value="completed" data-i18n="a.f_completed">Completed</option>
+            <option value="cancelled" data-i18n="a.f_cancelled">Cancelled</option>
           </select>
-          <button id="refresh-orders" class="btn btn-ghost text-sm"><span class="icon" data-icon="refresh"></span> Refresh</button>
+          <button id="refresh-orders" class="btn btn-ghost text-sm"><span class="icon" data-icon="refresh"></span> <span data-i18n="a.refresh">Refresh</span></button>
         </div>
       </div>
       <div id="orders-list" class="space-y-3"></div>
@@ -100,8 +101,8 @@
     <!-- Menu -->
     <section id="tab-menu" class="hidden">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="text-lg font-extrabold text-gray-800">Menu items</h2>
-        <button id="add-product" class="btn btn-primary text-sm"><span class="icon" data-icon="plus"></span> Add item</button>
+        <h2 class="text-lg font-extrabold text-gray-800" data-i18n="a.menu_items">Menu items</h2>
+        <button id="add-product" class="btn btn-primary text-sm"><span class="icon" data-icon="plus"></span> <span data-i18n="a.add_item">Add item</span></button>
       </div>
       <div id="menu-list" class="grid md:grid-cols-2 gap-3"></div>
     </section>
@@ -109,8 +110,8 @@
     <!-- Categories -->
     <section id="tab-categories" class="hidden">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="text-lg font-extrabold text-gray-800">Categories</h2>
-        <button id="add-category" class="btn btn-primary text-sm"><span class="icon" data-icon="plus"></span> Add category</button>
+        <h2 class="text-lg font-extrabold text-gray-800" data-i18n="a.categories">Categories</h2>
+        <button id="add-category" class="btn btn-primary text-sm"><span class="icon" data-icon="plus"></span> <span data-i18n="a.add_category">Add category</span></button>
       </div>
       <div id="category-list" class="grid md:grid-cols-2 gap-3"></div>
     </section>
@@ -118,18 +119,18 @@
     <!-- Promotions -->
     <section id="tab-promotions" class="hidden">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="text-lg font-extrabold text-gray-800">Promotions</h2>
-        <button id="add-promo" class="btn btn-primary text-sm"><span class="icon" data-icon="plus"></span> Add promotion</button>
+        <h2 class="text-lg font-extrabold text-gray-800" data-i18n="a.promotions">Promotions</h2>
+        <button id="add-promo" class="btn btn-primary text-sm"><span class="icon" data-icon="plus"></span> <span data-i18n="a.add_promotion">Add promotion</span></button>
       </div>
-      <p class="text-sm text-gray-500 mb-3">Percentage discounts applied automatically on the storefront. For a single-item sale, set a sale price in the Menu editor instead.</p>
+      <p class="text-sm text-gray-500 mb-3" data-i18n="a.promo_desc">Percentage discounts applied automatically on the storefront. For a single-item sale, set a sale price in the Menu editor instead.</p>
       <div id="promo-list" class="grid md:grid-cols-2 gap-3"></div>
     </section>
 
     <!-- Coupons -->
     <section id="tab-coupons" class="hidden">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="text-lg font-extrabold text-gray-800">Coupons</h2>
-        <button id="add-coupon" class="btn btn-primary text-sm"><span class="icon" data-icon="plus"></span> Add coupon</button>
+        <h2 class="text-lg font-extrabold text-gray-800" data-i18n="a.coupons">Coupons</h2>
+        <button id="add-coupon" class="btn btn-primary text-sm"><span class="icon" data-icon="plus"></span> <span data-i18n="a.add_coupon">Add coupon</span></button>
       </div>
       <div id="coupon-list" class="grid md:grid-cols-2 gap-3"></div>
     </section>
@@ -137,61 +138,61 @@
     <!-- Payments -->
     <section id="tab-payments" class="hidden">
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
-        <div class="card p-4"><p class="text-xs text-gray-500">Paid (all time)</p><p id="pay-paid" class="text-2xl font-extrabold text-emerald-600">RM 0</p></div>
-        <div class="card p-4"><p class="text-xs text-gray-500">Awaiting payment</p><p id="pay-unpaid" class="text-2xl font-extrabold text-amber-600">RM 0</p></div>
-        <div class="card p-4"><p class="text-xs text-gray-500">Unpaid orders</p><p id="pay-unpaid-count" class="text-2xl font-extrabold text-purple-600">0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500" data-i18n="a.pay_paid">Paid (all time)</p><p id="pay-paid" class="text-2xl font-extrabold text-emerald-600">RM 0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500" data-i18n="a.pay_unpaid">Awaiting payment</p><p id="pay-unpaid" class="text-2xl font-extrabold text-amber-600">RM 0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500" data-i18n="a.pay_unpaid_count">Unpaid orders</p><p id="pay-unpaid-count" class="text-2xl font-extrabold text-purple-600">0</p></div>
       </div>
-      <h2 class="text-lg font-extrabold text-gray-800 mb-3">Awaiting payment</h2>
+      <h2 class="text-lg font-extrabold text-gray-800 mb-3" data-i18n="a.awaiting">Awaiting payment</h2>
       <div id="payments-list" class="space-y-3"></div>
     </section>
 
     <!-- Announcements -->
     <section id="tab-announcements" class="hidden">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="text-lg font-extrabold text-gray-800">Announcements</h2>
-        <button id="add-announce" class="btn btn-primary text-sm"><span class="icon" data-icon="plus"></span> Add announcement</button>
+        <h2 class="text-lg font-extrabold text-gray-800" data-i18n="a.announcements">Announcements</h2>
+        <button id="add-announce" class="btn btn-primary text-sm"><span class="icon" data-icon="plus"></span> <span data-i18n="a.add_announcement">Add announcement</span></button>
       </div>
-      <p class="text-sm text-gray-500 mb-3">The newest active announcement shows as a banner on the storefront.</p>
+      <p class="text-sm text-gray-500 mb-3" data-i18n="a.ann_desc">The newest active announcement shows as a banner on the storefront.</p>
       <div id="announce-list" class="grid md:grid-cols-2 gap-3"></div>
     </section>
 
     <!-- Customers -->
     <section id="tab-customers" class="hidden">
-      <h2 class="text-lg font-extrabold text-gray-800 mb-3">Customers</h2>
+      <h2 class="text-lg font-extrabold text-gray-800 mb-3" data-i18n="a.customers">Customers</h2>
       <div id="customer-list" class="card overflow-hidden"></div>
     </section>
 
     <!-- Analytics -->
     <section id="tab-analytics" class="hidden">
-      <h2 class="text-lg font-extrabold text-gray-800 mb-3">Analytics</h2>
+      <h2 class="text-lg font-extrabold text-gray-800 mb-3" data-i18n="a.analytics">Analytics</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-        <div class="card p-4"><p class="text-xs text-gray-500">Total orders</p><p id="an-orders" class="text-2xl font-extrabold brand-gradient-text">0</p></div>
-        <div class="card p-4"><p class="text-xs text-gray-500">Total revenue</p><p id="an-revenue" class="text-2xl font-extrabold text-emerald-600">RM 0</p></div>
-        <div class="card p-4"><p class="text-xs text-gray-500">Avg. order</p><p id="an-avg" class="text-2xl font-extrabold text-purple-600">RM 0</p></div>
-        <div class="card p-4"><p class="text-xs text-gray-500">Customers</p><p id="an-customers" class="text-2xl font-extrabold text-gray-700">0</p></div>
-        <div class="card p-4"><p class="text-xs text-gray-500">Avg. rating</p><p id="an-rating" class="text-2xl font-extrabold text-amber-500">—</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500" data-i18n="a.an_orders">Total orders</p><p id="an-orders" class="text-2xl font-extrabold brand-gradient-text">0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500" data-i18n="a.an_revenue">Total revenue</p><p id="an-revenue" class="text-2xl font-extrabold text-emerald-600">RM 0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500" data-i18n="a.an_avg">Avg. order</p><p id="an-avg" class="text-2xl font-extrabold text-purple-600">RM 0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500" data-i18n="a.an_customers">Customers</p><p id="an-customers" class="text-2xl font-extrabold text-gray-700">0</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500" data-i18n="a.an_rating">Avg. rating</p><p id="an-rating" class="text-2xl font-extrabold text-amber-500">—</p></div>
       </div>
       <div class="grid md:grid-cols-2 gap-4">
-        <div class="card p-5"><h3 class="font-bold text-gray-800 mb-3">Revenue — last 14 days</h3><div id="an-revchart" class="space-y-1.5"></div></div>
-        <div class="card p-5"><h3 class="font-bold text-gray-800 mb-3">Top sellers</h3><div id="an-top" class="space-y-2"></div></div>
+        <div class="card p-5"><h3 class="font-bold text-gray-800 mb-3" data-i18n="a.rev14">Revenue — last 14 days</h3><div id="an-revchart" class="space-y-1.5"></div></div>
+        <div class="card p-5"><h3 class="font-bold text-gray-800 mb-3" data-i18n="a.topsellers">Top sellers</h3><div id="an-top" class="space-y-2"></div></div>
       </div>
     </section>
 
     <!-- Settings -->
     <section id="tab-settings" class="hidden">
-      <h2 class="text-lg font-extrabold text-gray-800 mb-3">Shop settings</h2>
+      <h2 class="text-lg font-extrabold text-gray-800 mb-3" data-i18n="a.shop_settings">Shop settings</h2>
       <form id="settings-form" class="card p-5 grid md:grid-cols-2 gap-4 max-w-3xl">
-        <div><label class="text-xs font-semibold text-gray-500">Shop name</label><input name="shop_name" class="field mt-1" /></div>
-        <div><label class="text-xs font-semibold text-gray-500">Tagline</label><input name="shop_tagline" class="field mt-1" /></div>
-        <div><label class="text-xs font-semibold text-gray-500">Address</label><input name="address" class="field mt-1" /></div>
-        <div><label class="text-xs font-semibold text-gray-500">Opening hours</label><input name="hours" class="field mt-1" /></div>
-        <div><label class="text-xs font-semibold text-gray-500">WhatsApp (e.g. 60128…)</label><input name="whatsapp" class="field mt-1" /></div>
-        <div><label class="text-xs font-semibold text-gray-500">Delivery fee (RM)</label><input name="delivery_fee" type="number" step="0.01" class="field mt-1" /></div>
-        <div><label class="text-xs font-semibold text-gray-500">Free delivery over (RM)</label><input name="free_delivery_over" type="number" step="0.01" class="field mt-1" /></div>
-        <div><label class="text-xs font-semibold text-gray-500">Bank / DuitNow details</label><input name="bank_details" class="field mt-1" placeholder="Maybank 1234… / DuitNow QR" /></div>
-        <div class="md:col-span-2"><button type="submit" class="btn btn-primary py-3 px-6">Save settings</button></div>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.s_name">Shop name</label><input name="shop_name" class="field mt-1" /></div>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.s_tagline">Tagline</label><input name="shop_tagline" class="field mt-1" /></div>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.s_address">Address</label><input name="address" class="field mt-1" /></div>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.s_hours">Opening hours</label><input name="hours" class="field mt-1" /></div>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.s_whatsapp">WhatsApp (e.g. 60128…)</label><input name="whatsapp" class="field mt-1" /></div>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.s_delivery">Delivery fee (RM)</label><input name="delivery_fee" type="number" step="0.01" class="field mt-1" /></div>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.s_free">Free delivery over (RM)</label><input name="free_delivery_over" type="number" step="0.01" class="field mt-1" /></div>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.s_bank">Bank / DuitNow details</label><input name="bank_details" class="field mt-1" placeholder="Maybank 1234… / DuitNow QR" /></div>
+        <div class="md:col-span-2"><button type="submit" class="btn btn-primary py-3 px-6" data-i18n="a.save_settings">Save settings</button></div>
       </form>
-      <p class="text-xs text-gray-400 mt-3 max-w-3xl">Note: shop name, WhatsApp and delivery values are also read from <code>js/config.js</code> as fallbacks; saving here updates the database for future use.</p>
+      <p class="text-xs text-gray-400 mt-3 max-w-3xl" data-i18n="a.s_note">Note: shop name, WhatsApp and delivery values are also read from <code>js/config.js</code> as fallbacks; saving here updates the database for future use.</p>
     </section>
   </main>
 
@@ -204,33 +205,33 @@
       </div>
       <form id="product-form" class="space-y-3">
         <input type="hidden" name="id" />
-        <div><label class="text-xs font-semibold text-gray-500">Name</label>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.name">Name</label>
           <input name="name" required class="field mt-1" placeholder="e.g. Smoked Duck Rice Roll 烟熏鸭肉饭团" /></div>
-        <div><label class="text-xs font-semibold text-gray-500">Category</label>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.category">Category</label>
           <select name="category_id" class="field mt-1"></select></div>
-        <div><label class="text-xs font-semibold text-gray-500">Description</label>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.description">Description</label>
           <input name="description" class="field mt-1" placeholder="Short description" /></div>
         <div class="grid grid-cols-3 gap-3">
-          <div><label class="text-xs font-semibold text-gray-500">Price (RM)</label>
+          <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.price">Price (RM)</label>
             <input name="price" type="number" step="0.01" min="0" required class="field mt-1" /></div>
-          <div><label class="text-xs font-semibold text-gray-500">Sale price</label>
-            <input name="sale_price" type="number" step="0.01" min="0" class="field mt-1" placeholder="optional" /></div>
-          <div><label class="text-xs font-semibold text-gray-500">Available</label>
-            <select name="available" class="field mt-1"><option value="true">Yes</option><option value="false">No</option></select></div>
+          <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.sale_price">Sale price</label>
+            <input name="sale_price" type="number" step="0.01" min="0" class="field mt-1" data-i18n-ph="a.optional" placeholder="optional" /></div>
+          <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.available">Available</label>
+            <select name="available" class="field mt-1"><option value="true" data-i18n="a.yes">Yes</option><option value="false" data-i18n="a.no">No</option></select></div>
         </div>
         <div>
-          <label class="text-xs font-semibold text-gray-500">Product photo</label>
+          <label class="text-xs font-semibold text-gray-500" data-i18n="a.photo">Product photo</label>
           <div class="flex items-center gap-3 mt-1">
             <div id="product-photo-preview" class="thumb-fallback w-16 h-16 rounded-lg text-white shrink-0 overflow-hidden"></div>
             <div class="flex-1">
               <input type="file" id="product-photo-file" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-purple-100 file:text-purple-700 file:font-semibold file:cursor-pointer" />
-              <p id="product-photo-status" class="text-xs text-gray-400 mt-1">JPG/PNG, uploaded to your store.</p>
+              <p id="product-photo-status" class="text-xs text-gray-400 mt-1" data-i18n="a.photo_hint">JPG/PNG, uploaded to your store.</p>
             </div>
           </div>
-          <input name="image_url" class="field mt-2 text-xs" placeholder="…or paste an image URL" />
+          <input name="image_url" class="field mt-2 text-xs" data-i18n-ph="a.or_url" placeholder="…or paste an image URL" />
         </div>
         <div class="flex gap-2 pt-1">
-          <button type="submit" class="btn btn-primary flex-1 py-3">Save</button>
+          <button type="submit" class="btn btn-primary flex-1 py-3" data-i18n="a.save">Save</button>
           <button type="button" id="product-delete" class="btn btn-ghost !text-red-600 !bg-red-50 hidden"><span class="icon" data-icon="trash"></span></button>
         </div>
       </form>
@@ -246,16 +247,16 @@
       </div>
       <form id="category-form" class="space-y-3">
         <input type="hidden" name="id" />
-        <div><label class="text-xs font-semibold text-gray-500">Name</label>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.name">Name</label>
           <input name="name" required class="field mt-1" placeholder="e.g. Rice Rolls 台湾紫米饭团" /></div>
         <div class="grid grid-cols-2 gap-3">
-          <div><label class="text-xs font-semibold text-gray-500">Sort order</label>
+          <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.sort_order">Sort order</label>
             <input name="sort_order" type="number" class="field mt-1" value="0" /></div>
-          <div><label class="text-xs font-semibold text-gray-500">Active</label>
-            <select name="active" class="field mt-1"><option value="true">Yes</option><option value="false">No</option></select></div>
+          <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.active">Active</label>
+            <select name="active" class="field mt-1"><option value="true" data-i18n="a.yes">Yes</option><option value="false" data-i18n="a.no">No</option></select></div>
         </div>
         <div class="flex gap-2 pt-1">
-          <button type="submit" class="btn btn-primary flex-1 py-3">Save</button>
+          <button type="submit" class="btn btn-primary flex-1 py-3" data-i18n="a.save">Save</button>
           <button type="button" id="category-delete" class="btn btn-ghost !text-red-600 !bg-red-50 hidden"><span class="icon" data-icon="trash"></span></button>
         </div>
       </form>
@@ -271,28 +272,28 @@
       </div>
       <form id="promo-form" class="space-y-3">
         <input type="hidden" name="id" />
-        <div><label class="text-xs font-semibold text-gray-500">Name</label>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.name">Name</label>
           <input name="name" required class="field mt-1" placeholder="e.g. Weekend 10% off" /></div>
         <div class="grid grid-cols-2 gap-3">
-          <div><label class="text-xs font-semibold text-gray-500">Discount %</label>
+          <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.discount_pct">Discount %</label>
             <input name="percent_off" type="number" min="1" max="100" required class="field mt-1" /></div>
-          <div><label class="text-xs font-semibold text-gray-500">Ends on</label>
+          <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.ends_on">Ends on</label>
             <input name="ends_at" type="date" class="field mt-1" /></div>
         </div>
-        <div><label class="text-xs font-semibold text-gray-500">Applies to</label>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.applies_to">Applies to</label>
           <select name="scope" id="promo-scope" class="field mt-1">
-            <option value="all">All items</option>
-            <option value="category">A category</option>
-            <option value="product">A single item</option>
+            <option value="all" data-i18n="a.all_items">All items</option>
+            <option value="category" data-i18n="a.a_category">A category</option>
+            <option value="product" data-i18n="a.single_item">A single item</option>
           </select></div>
-        <div id="promo-cat-wrap" class="hidden"><label class="text-xs font-semibold text-gray-500">Category</label>
+        <div id="promo-cat-wrap" class="hidden"><label class="text-xs font-semibold text-gray-500" data-i18n="a.category">Category</label>
           <select name="category_id" class="field mt-1"></select></div>
-        <div id="promo-prod-wrap" class="hidden"><label class="text-xs font-semibold text-gray-500">Item</label>
+        <div id="promo-prod-wrap" class="hidden"><label class="text-xs font-semibold text-gray-500" data-i18n="a.item">Item</label>
           <select name="product_id" class="field mt-1"></select></div>
-        <div><label class="text-xs font-semibold text-gray-500">Active</label>
-          <select name="active" class="field mt-1"><option value="true">Yes</option><option value="false">No</option></select></div>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.active">Active</label>
+          <select name="active" class="field mt-1"><option value="true" data-i18n="a.yes">Yes</option><option value="false" data-i18n="a.no">No</option></select></div>
         <div class="flex gap-2 pt-1">
-          <button type="submit" class="btn btn-primary flex-1 py-3">Save</button>
+          <button type="submit" class="btn btn-primary flex-1 py-3" data-i18n="a.save">Save</button>
           <button type="button" id="promo-delete" class="btn btn-ghost !text-red-600 !bg-red-50 hidden"><span class="icon" data-icon="trash"></span></button>
         </div>
       </form>
@@ -308,24 +309,24 @@
       </div>
       <form id="coupon-form" class="space-y-3">
         <input type="hidden" name="id" />
-        <div><label class="text-xs font-semibold text-gray-500">Code</label>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.code">Code</label>
           <input name="code" required class="field mt-1 uppercase" placeholder="WELCOME10" /></div>
         <div class="grid grid-cols-2 gap-3">
-          <div><label class="text-xs font-semibold text-gray-500">Type</label>
-            <select name="discount_type" class="field mt-1"><option value="percent">Percent %</option><option value="fixed">Fixed RM</option></select></div>
-          <div><label class="text-xs font-semibold text-gray-500">Value</label>
+          <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.c_type">Type</label>
+            <select name="discount_type" class="field mt-1"><option value="percent" data-i18n="a.percent">Percent %</option><option value="fixed" data-i18n="a.fixed">Fixed RM</option></select></div>
+          <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.value">Value</label>
             <input name="discount_value" type="number" step="0.01" min="0" required class="field mt-1" /></div>
         </div>
         <div class="grid grid-cols-2 gap-3">
-          <div><label class="text-xs font-semibold text-gray-500">Min spend (RM)</label>
+          <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.min_spend">Min spend (RM)</label>
             <input name="min_subtotal" type="number" step="0.01" min="0" class="field mt-1" value="0" /></div>
-          <div><label class="text-xs font-semibold text-gray-500">Expires on</label>
+          <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.expires_on">Expires on</label>
             <input name="expires_at" type="date" class="field mt-1" /></div>
         </div>
-        <div><label class="text-xs font-semibold text-gray-500">Active</label>
-          <select name="active" class="field mt-1"><option value="true">Yes</option><option value="false">No</option></select></div>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.active">Active</label>
+          <select name="active" class="field mt-1"><option value="true" data-i18n="a.yes">Yes</option><option value="false" data-i18n="a.no">No</option></select></div>
         <div class="flex gap-2 pt-1">
-          <button type="submit" class="btn btn-primary flex-1 py-3">Save</button>
+          <button type="submit" class="btn btn-primary flex-1 py-3" data-i18n="a.save">Save</button>
           <button type="button" id="coupon-delete" class="btn btn-ghost !text-red-600 !bg-red-50 hidden"><span class="icon" data-icon="trash"></span></button>
         </div>
       </form>
@@ -341,14 +342,14 @@
       </div>
       <form id="announce-form" class="space-y-3">
         <input type="hidden" name="id" />
-        <div><label class="text-xs font-semibold text-gray-500">Title</label>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.a_title">Title</label>
           <input name="title" required class="field mt-1" placeholder="e.g. Now ordering online!" /></div>
-        <div><label class="text-xs font-semibold text-gray-500">Body (optional)</label>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.a_body">Body (optional)</label>
           <input name="body" class="field mt-1" placeholder="Short message" /></div>
-        <div><label class="text-xs font-semibold text-gray-500">Active</label>
-          <select name="active" class="field mt-1"><option value="true">Yes</option><option value="false">No</option></select></div>
+        <div><label class="text-xs font-semibold text-gray-500" data-i18n="a.active">Active</label>
+          <select name="active" class="field mt-1"><option value="true" data-i18n="a.yes">Yes</option><option value="false" data-i18n="a.no">No</option></select></div>
         <div class="flex gap-2 pt-1">
-          <button type="submit" class="btn btn-primary flex-1 py-3">Save</button>
+          <button type="submit" class="btn btn-primary flex-1 py-3" data-i18n="a.save">Save</button>
           <button type="button" id="announce-delete" class="btn btn-ghost !text-red-600 !bg-red-50 hidden"><span class="icon" data-icon="trash"></span></button>
         </div>
       </form>
@@ -357,6 +358,7 @@
 
   <script src="../js/config.js"></script>
   <script src="../js/icons.js"></script>
+  <script src="../js/i18n.js"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/admin.js"></script>
 </body>

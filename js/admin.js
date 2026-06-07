@@ -44,10 +44,9 @@
   function renderShopStatus() {
     document.getElementById('shop-status-dot').className = 'w-3 h-3 rounded-full ' + (shopOpen ? 'bg-emerald-500' : 'bg-red-500');
     document.getElementById('shop-status-text').textContent = shopOpen
-      ? 'Open for orders — customers can order now.'
-      : 'Closed — customers cannot place orders.';
+      ? I18N.t('a.open_full') : I18N.t('a.closed_full');
     const btn = document.getElementById('shop-toggle');
-    btn.textContent = shopOpen ? 'Close shop' : 'Open shop';
+    btn.textContent = shopOpen ? I18N.t('a.close_shop') : I18N.t('a.open_shop');
     btn.className = 'btn text-sm ' + (shopOpen ? 'btn-ghost !text-red-600 !bg-red-50' : 'btn-primary');
   }
   async function toggleShop() {
@@ -56,7 +55,7 @@
       { key: 'shop_open', value: String(next), updated_at: new Date().toISOString() }, { onConflict: 'key' });
     if (error) return showToast(error.message, 'error');
     shopOpen = next; renderShopStatus();
-    showToast(next ? 'Shop is now OPEN' : 'Shop is now CLOSED', next ? 'success' : 'info');
+    showToast(next ? I18N.t('a.shop_open_now') : I18N.t('a.shop_closed_now'), next ? 'success' : 'info');
   }
 
   async function login(e) {
@@ -65,7 +64,7 @@
     const { error } = await sb.auth.signInWithPassword({ email: f.email.value.trim(), password: f.password.value });
     if (error) return showToast(error.message, 'error');
     const profile = await getProfile();
-    if (!profile || profile.role !== 'admin') { await sb.auth.signOut(); return showToast('This account is not an admin.', 'error'); }
+    if (!profile || profile.role !== 'admin') { await sb.auth.signOut(); return showToast(I18N.t('a.not_admin'), 'error'); }
     showDashboard();
   }
 
@@ -80,6 +79,7 @@
   const openModal = (id) => document.getElementById(id).classList.add('open');
   const closeModal = (id) => document.getElementById(id).classList.remove('open');
   const esc = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const statusLabel = (s) => I18N.t('status.' + s);
 
   // ===================== ORDERS ==========================================
   async function loadOrders() {
@@ -103,7 +103,7 @@
   }
   function renderOrders(orders) {
     const host = document.getElementById('orders-list');
-    if (!orders.length) { host.innerHTML = `<p class="text-center text-gray-400 py-10">No orders yet.</p>`; return; }
+    if (!orders.length) { host.innerHTML = `<p class="text-center text-gray-400 py-10">${I18N.t('a.noorders')}</p>`; return; }
     host.innerHTML = orders.map((o) => {
       const items = (o.order_items || []).map((i) => `<li>${i.quantity}× ${i.product_name} <span class="text-gray-400">${money(i.line_total)}</span></li>`).join('');
       const time = new Date(o.created_at).toLocaleString('en-MY', { dateStyle: 'medium', timeStyle: 'short' });
@@ -113,24 +113,24 @@
       <div class="card p-4">
         <div class="flex items-start justify-between gap-3">
           <div><p class="font-extrabold text-gray-800">${o.order_number}</p><p class="text-xs text-gray-400">${time}</p></div>
-          <span class="badge badge-${o.status}">${o.status}</span>
+          <span class="badge badge-${o.status}">${statusLabel(o.status)}</span>
         </div>
         <ul class="text-sm text-gray-600 mt-3 space-y-0.5">${items}</ul>
         <div class="text-sm mt-3 pt-3 border-t border-purple-50 grid grid-cols-2 gap-x-3 gap-y-1">
-          <span class="text-gray-400">Recipient</span><span class="text-right font-medium">${esc(o.customer_name)}</span>
-          <span class="text-gray-400">Phone</span><span class="text-right">${esc(o.customer_phone)}</span>
-          <span class="text-gray-400">Type</span><span class="text-right capitalize">${o.fulfillment_type}</span>
-          ${o.address ? `<span class="text-gray-400">Address</span><span class="text-right">${esc(o.address)}</span>` : ''}
-          ${o.notes ? `<span class="text-gray-400">Notes</span><span class="text-right">${esc(o.notes)}</span>` : ''}
-          ${o.coupon_code ? `<span class="text-gray-400">Coupon</span><span class="text-right">${esc(o.coupon_code)} (-${money(o.discount)})</span>` : ''}
-          <span class="text-gray-400">Payment</span><span class="text-right capitalize">${o.payment_method} · <span class="${o.payment_status === 'paid' ? 'text-emerald-600' : 'text-amber-600'} font-semibold">${o.payment_status || 'unpaid'}</span></span>
-          ${o.rating ? `<span class="text-gray-400">Rating</span><span class="text-right text-amber-500 font-semibold">${o.rating}/5</span>` : ''}
-          <span class="text-gray-400 font-bold">Total</span><span class="text-right font-extrabold brand-gradient-text">${money(o.total)}</span>
+          <span class="text-gray-400">${I18N.t('a.recipient')}</span><span class="text-right font-medium">${esc(o.customer_name)}</span>
+          <span class="text-gray-400">${I18N.t('a.phone')}</span><span class="text-right">${esc(o.customer_phone)}</span>
+          <span class="text-gray-400">${I18N.t('a.type')}</span><span class="text-right capitalize">${o.fulfillment_type}</span>
+          ${o.address ? `<span class="text-gray-400">${I18N.t('a.address')}</span><span class="text-right">${esc(o.address)}</span>` : ''}
+          ${o.notes ? `<span class="text-gray-400">${I18N.t('a.notes')}</span><span class="text-right">${esc(o.notes)}</span>` : ''}
+          ${o.coupon_code ? `<span class="text-gray-400">${I18N.t('a.coupon')}</span><span class="text-right">${esc(o.coupon_code)} (-${money(o.discount)})</span>` : ''}
+          <span class="text-gray-400">${I18N.t('a.payment')}</span><span class="text-right capitalize">${o.payment_method} · <span class="${o.payment_status === 'paid' ? 'text-emerald-600' : 'text-amber-600'} font-semibold">${o.payment_status==='paid'?I18N.t('a.paid'):I18N.t('a.unpaid')}</span></span>
+          ${o.rating ? `<span class="text-gray-400">${I18N.t('a.rating')}</span><span class="text-right text-amber-500 font-semibold">${o.rating}/5</span>` : ''}
+          <span class="text-gray-400 font-bold">${I18N.t('a.total')}</span><span class="text-right font-extrabold brand-gradient-text">${money(o.total)}</span>
         </div>
         <div class="flex gap-2 mt-3 flex-wrap">
-          ${next ? `<button class="btn btn-primary text-sm flex-1" data-advance="${o.id}" data-next="${next}">Mark ${next}</button>` : ''}
-          ${o.payment_status !== 'paid' ? `<button class="btn btn-ghost !text-emerald-700 !bg-emerald-50 text-sm" data-paid="${o.id}">Mark paid</button>` : ''}
-          ${o.status !== 'cancelled' && o.status !== 'completed' ? `<button class="btn btn-ghost !text-red-600 !bg-red-50 text-sm" data-cancel="${o.id}">Cancel</button>` : ''}
+          ${next ? `<button class="btn btn-primary text-sm flex-1" data-advance="${o.id}" data-next="${next}">${I18N.t('a.mark')} ${statusLabel(next)}</button>` : ''}
+          ${o.payment_status !== 'paid' ? `<button class="btn btn-ghost !text-emerald-700 !bg-emerald-50 text-sm" data-paid="${o.id}">${I18N.t('a.markpaid')}</button>` : ''}
+          ${o.status !== 'cancelled' && o.status !== 'completed' ? `<button class="btn btn-ghost !text-red-600 !bg-red-50 text-sm" data-cancel="${o.id}">${I18N.t('a.cancel')}</button>` : ''}
         </div>
       </div>`;
     }).join('');
@@ -142,12 +142,12 @@
   async function updateStatus(id, status) {
     const { error } = await sb.from('orders').update({ status }).eq('id', id);
     if (error) return showToast(error.message, 'error');
-    showToast(`Order marked ${status}`, 'success'); loadOrders();
+    showToast(`${I18N.t('a.mark')} ${statusLabel(status)}`, 'success'); loadOrders();
   }
   async function markPaid(id) {
     const { error } = await sb.from('orders').update({ payment_status: 'paid' }).eq('id', id);
     if (error) return showToast(error.message, 'error');
-    showToast('Marked as paid', 'success');
+    showToast(I18N.t('a.markpaid'), 'success');
     loadOrders(); if (loaded.payments) loadPayments();
   }
 
@@ -172,10 +172,10 @@
         </div>
         <div class="flex items-center gap-2 shrink-0">
           <span class="font-extrabold brand-gradient-text">${money(o.total)}</span>
-          <button class="btn btn-ghost !text-emerald-700 !bg-emerald-50 text-sm" data-paid="${o.id}">Mark paid</button>
+          <button class="btn btn-ghost !text-emerald-700 !bg-emerald-50 text-sm" data-paid="${o.id}">${I18N.t('a.markpaid')}</button>
         </div>
       </div>`;
-    }).join('') : `<p class="text-gray-400">All settled — no pending payments.</p>`;
+    }).join('') : `<p class="text-gray-400">${I18N.t('a.all_settled')}</p>`;
     host.querySelectorAll('[data-paid]').forEach((b) => b.addEventListener('click', () => markPaid(+b.dataset.paid)));
   }
 
@@ -194,7 +194,7 @@
           ${thumb}
           <div class="min-w-0">
             <p class="font-bold text-gray-800 truncate">${esc(p.name)}</p>
-            <p class="text-xs text-gray-400">${catName(p.category_id)} · ${sale ? `<span class="text-emerald-600">${money(p.sale_price)}</span> <span class="line-through">${money(p.price)}</span>` : money(p.price)} ${p.available ? '' : '· Sold out'}</p>
+            <p class="text-xs text-gray-400">${catName(p.category_id)} · ${sale ? `<span class="text-emerald-600">${money(p.sale_price)}</span> <span class="line-through">${money(p.price)}</span>` : money(p.price)} ${p.available ? '' : '· ' + I18N.t('menu.soldout')}</p>
           </div>
         </div>
         <button class="btn btn-ghost text-sm shrink-0" data-edit="${p.id}"><span class="icon" data-icon="edit"></span></button>
@@ -205,7 +205,7 @@
   }
   function openProduct(p) {
     const f = document.getElementById('product-form'); f.reset();
-    document.getElementById('product-modal-title').textContent = p ? 'Edit item' : 'Add item';
+    document.getElementById('product-modal-title').textContent = p ? I18N.t('a.edit_item') : I18N.t('a.add_item');
     document.getElementById('product-delete').classList.toggle('hidden', !p);
     f.id.value = p?.id || ''; f.name.value = p?.name || '';
     f.category_id.value = p?.category_id || (CATEGORIES[0]?.id ?? '');
@@ -249,14 +249,14 @@
     const id = f.id.value;
     const res = id ? await sb.from('products').update(row).eq('id', +id) : await sb.from('products').insert(row);
     if (res.error) return showToast(res.error.message, 'error');
-    showToast('Saved', 'success'); closeModal('product-modal'); loadMenu();
+    showToast(I18N.t('a.saved'), 'success'); closeModal('product-modal'); loadMenu();
   }
   async function deleteProduct() {
     const id = document.getElementById('product-form').id.value;
     if (!id || !confirm('Delete this item?')) return;
     const { error } = await sb.from('products').delete().eq('id', +id);
     if (error) return showToast(error.message, 'error');
-    showToast('Deleted', 'info'); closeModal('product-modal'); loadMenu();
+    showToast(I18N.t('a.deleted'), 'info'); closeModal('product-modal'); loadMenu();
   }
 
   // ===================== CATEGORIES ======================================
@@ -273,7 +273,7 @@
   }
   function openCategory(c) {
     const f = document.getElementById('category-form'); f.reset();
-    document.getElementById('category-modal-title').textContent = c ? 'Edit category' : 'Add category';
+    document.getElementById('category-modal-title').textContent = c ? I18N.t('a.edit_category') : I18N.t('a.add_category');
     document.getElementById('category-delete').classList.toggle('hidden', !c);
     f.id.value = c?.id || ''; f.name.value = c?.name || '';
     f.sort_order.value = c?.sort_order ?? 0; f.active.value = String(c?.active ?? true);
@@ -285,14 +285,14 @@
     const id = f.id.value;
     const res = id ? await sb.from('categories').update(row).eq('id', +id) : await sb.from('categories').insert(row);
     if (res.error) return showToast(res.error.message, 'error');
-    showToast('Saved', 'success'); closeModal('category-modal'); loadCategoriesTab();
+    showToast(I18N.t('a.saved'), 'success'); closeModal('category-modal'); loadCategoriesTab();
   }
   async function deleteCategory() {
     const id = document.getElementById('category-form').id.value;
     if (!id || !confirm('Delete this category? Items keep existing but become uncategorised.')) return;
     const { error } = await sb.from('categories').delete().eq('id', +id);
     if (error) return showToast(error.message, 'error');
-    showToast('Deleted', 'info'); closeModal('category-modal'); loadCategoriesTab();
+    showToast(I18N.t('a.deleted'), 'info'); closeModal('category-modal'); loadCategoriesTab();
   }
 
   // ===================== PROMOTIONS ======================================
@@ -310,7 +310,7 @@
           <p class="text-xs text-gray-400">${esc(target)}${p.ends_at ? ' · ends ' + p.ends_at : ''}${p.active ? '' : ' · Inactive'}</p></div>
         <button class="btn btn-ghost text-sm" data-edit="${p.id}"><span class="icon" data-icon="edit"></span></button>
       </div>`;
-    }).join('') : `<p class="text-gray-400">No promotions yet.</p>`;
+    }).join('') : `<p class="text-gray-400">${I18N.t('a.no_promos')}</p>`;
     host.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', async () => {
       const { data: one } = await sb.from('promotions').select('*').eq('id', +b.dataset.edit).single(); openPromo(one);
     }));
@@ -323,7 +323,7 @@
   }
   function openPromo(p) {
     const f = document.getElementById('promo-form'); f.reset();
-    document.getElementById('promo-modal-title').textContent = p ? 'Edit promotion' : 'Add promotion';
+    document.getElementById('promo-modal-title').textContent = p ? I18N.t('a.edit_promotion') : I18N.t('a.add_promotion');
     document.getElementById('promo-delete').classList.toggle('hidden', !p);
     f.id.value = p?.id || ''; f.name.value = p?.name || ''; f.percent_off.value = p?.percent_off ?? '';
     f.ends_at.value = p?.ends_at || ''; f.scope.value = p?.scope || 'all';
@@ -343,13 +343,13 @@
     const id = f.id.value;
     const res = id ? await sb.from('promotions').update(row).eq('id', +id) : await sb.from('promotions').insert(row);
     if (res.error) return showToast(res.error.message, 'error');
-    showToast('Saved', 'success'); closeModal('promo-modal'); loadPromos();
+    showToast(I18N.t('a.saved'), 'success'); closeModal('promo-modal'); loadPromos();
   }
   async function deletePromo() {
     const id = document.getElementById('promo-form').id.value;
     if (!id || !confirm('Delete this promotion?')) return;
     await sb.from('promotions').delete().eq('id', +id);
-    showToast('Deleted', 'info'); closeModal('promo-modal'); loadPromos();
+    showToast(I18N.t('a.deleted'), 'info'); closeModal('promo-modal'); loadPromos();
   }
 
   // ===================== COUPONS =========================================
@@ -364,7 +364,7 @@
           <p class="text-xs text-gray-400">Min ${money(c.min_subtotal)}${c.expires_at ? ' · exp ' + c.expires_at : ''}${c.active ? '' : ' · Inactive'}</p></div>
         <button class="btn btn-ghost text-sm" data-edit="${c.id}"><span class="icon" data-icon="edit"></span></button>
       </div>`;
-    }).join('') : `<p class="text-gray-400">No coupons yet.</p>`;
+    }).join('') : `<p class="text-gray-400">${I18N.t('a.no_coupons')}</p>`;
     host.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', async () => {
       const { data: one } = await sb.from('coupons').select('*').eq('id', +b.dataset.edit).single(); openCoupon(one);
     }));
@@ -372,7 +372,7 @@
   }
   function openCoupon(c) {
     const f = document.getElementById('coupon-form'); f.reset();
-    document.getElementById('coupon-modal-title').textContent = c ? 'Edit coupon' : 'Add coupon';
+    document.getElementById('coupon-modal-title').textContent = c ? I18N.t('a.edit_coupon') : I18N.t('a.add_coupon');
     document.getElementById('coupon-delete').classList.toggle('hidden', !c);
     f.id.value = c?.id || ''; f.code.value = c?.code || ''; f.discount_type.value = c?.discount_type || 'percent';
     f.discount_value.value = c?.discount_value ?? ''; f.min_subtotal.value = c?.min_subtotal ?? 0;
@@ -389,13 +389,13 @@
     const id = f.id.value;
     const res = id ? await sb.from('coupons').update(row).eq('id', +id) : await sb.from('coupons').insert(row);
     if (res.error) return showToast(res.error.message, 'error');
-    showToast('Saved', 'success'); closeModal('coupon-modal'); loadCoupons();
+    showToast(I18N.t('a.saved'), 'success'); closeModal('coupon-modal'); loadCoupons();
   }
   async function deleteCoupon() {
     const id = document.getElementById('coupon-form').id.value;
     if (!id || !confirm('Delete this coupon?')) return;
     await sb.from('coupons').delete().eq('id', +id);
-    showToast('Deleted', 'info'); closeModal('coupon-modal'); loadCoupons();
+    showToast(I18N.t('a.deleted'), 'info'); closeModal('coupon-modal'); loadCoupons();
   }
 
   // ===================== ANNOUNCEMENTS ===================================
@@ -406,7 +406,7 @@
       <div class="card p-4 flex items-center justify-between gap-3 ${a.active ? '' : 'opacity-60'}">
         <div><p class="font-bold text-gray-800">${esc(a.title)}</p><p class="text-xs text-gray-400">${esc(a.body || '')}${a.active ? '' : ' · Inactive'}</p></div>
         <button class="btn btn-ghost text-sm" data-edit="${a.id}"><span class="icon" data-icon="edit"></span></button>
-      </div>`).join('') : `<p class="text-gray-400">No announcements yet.</p>`;
+      </div>`).join('') : `<p class="text-gray-400">${I18N.t('a.no_ann')}</p>`;
     host.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', async () => {
       const { data: one } = await sb.from('announcements').select('*').eq('id', +b.dataset.edit).single(); openAnnounce(one);
     }));
@@ -414,7 +414,7 @@
   }
   function openAnnounce(a) {
     const f = document.getElementById('announce-form'); f.reset();
-    document.getElementById('announce-modal-title').textContent = a ? 'Edit announcement' : 'Add announcement';
+    document.getElementById('announce-modal-title').textContent = a ? I18N.t('a.edit_announcement') : I18N.t('a.add_announcement');
     document.getElementById('announce-delete').classList.toggle('hidden', !a);
     f.id.value = a?.id || ''; f.title.value = a?.title || ''; f.body.value = a?.body || '';
     f.active.value = String(a?.active ?? true); openModal('announce-modal');
@@ -425,13 +425,13 @@
     const id = f.id.value;
     const res = id ? await sb.from('announcements').update(row).eq('id', +id) : await sb.from('announcements').insert(row);
     if (res.error) return showToast(res.error.message, 'error');
-    showToast('Saved', 'success'); closeModal('announce-modal'); loadAnnounce();
+    showToast(I18N.t('a.saved'), 'success'); closeModal('announce-modal'); loadAnnounce();
   }
   async function deleteAnnounce() {
     const id = document.getElementById('announce-form').id.value;
     if (!id || !confirm('Delete this announcement?')) return;
     await sb.from('announcements').delete().eq('id', +id);
-    showToast('Deleted', 'info'); closeModal('announce-modal'); loadAnnounce();
+    showToast(I18N.t('a.deleted'), 'info'); closeModal('announce-modal'); loadAnnounce();
   }
 
   // ===================== CUSTOMERS =======================================
@@ -455,26 +455,26 @@
         <td class="py-2.5 px-3 text-right">${s.n}</td>
         <td class="py-2.5 px-3 text-right font-semibold">${money(s.spent)}</td>
         <td class="py-2.5 px-3 text-right text-purple-700 font-semibold">${p.loyalty_points || 0}</td>
-        <td class="py-2.5 px-3 text-right"><button class="btn btn-ghost text-xs" data-points="${p.id}" data-cur="${p.loyalty_points || 0}">Adjust</button></td>
+        <td class="py-2.5 px-3 text-right"><button class="btn btn-ghost text-xs" data-points="${p.id}" data-cur="${p.loyalty_points || 0}">${I18N.t('a.adjust')}</button></td>
       </tr>`;
     }).join('');
     const host = document.getElementById('customer-list');
     host.innerHTML = `
       <div class="overflow-x-auto"><table class="w-full text-sm min-w-[520px]">
         <thead class="bg-purple-50 text-gray-500 text-xs uppercase">
-          <tr><th class="py-2 px-3 text-left">Name</th><th class="py-2 px-3 text-left">Phone</th>
-          <th class="py-2 px-3 text-right">Orders</th><th class="py-2 px-3 text-right">Spent</th>
-          <th class="py-2 px-3 text-right">Points</th><th class="py-2 px-3 text-right">Action</th></tr>
+          <tr><th class="py-2 px-3 text-left">${I18N.t('a.c_name')}</th><th class="py-2 px-3 text-left">${I18N.t('a.c_phone')}</th>
+          <th class="py-2 px-3 text-right">${I18N.t('a.c_orders')}</th><th class="py-2 px-3 text-right">${I18N.t('a.c_spent')}</th>
+          <th class="py-2 px-3 text-right">${I18N.t('a.c_points')}</th><th class="py-2 px-3 text-right">${I18N.t('a.c_action')}</th></tr>
         </thead>
-        <tbody>${rows || '<tr><td class="py-6 px-3 text-gray-400" colspan="6">No customers yet.</td></tr>'}</tbody>
+        <tbody>${rows || ('<tr><td class="py-6 px-3 text-gray-400" colspan="6">' + I18N.t('a.no_customers') + '</td></tr>')}</tbody>
       </table></div>`;
     host.querySelectorAll('[data-points]').forEach((b) => b.addEventListener('click', async () => {
-      const v = prompt('Set loyalty points for this customer:', b.dataset.cur);
+      const v = prompt(I18N.t('a.set_points'), b.dataset.cur);
       if (v === null) return;
       const n = parseInt(v, 10); if (isNaN(n) || n < 0) return showToast('Enter a valid number', 'error');
       const { error } = await sb.from('profiles').update({ loyalty_points: n }).eq('id', b.dataset.points);
       if (error) return showToast(error.message, 'error');
-      showToast('Points updated', 'success'); loadCustomers();
+      showToast(I18N.t('a.points_updated'), 'success'); loadCustomers();
     }));
   }
 
@@ -514,7 +514,7 @@
     document.getElementById('an-top').innerHTML = sorted.length ? sorted.map(([n, q], idx) =>
       `<div class="flex items-center gap-2 text-sm"><span class="w-5 text-gray-400">${idx + 1}.</span>
        <span class="flex-1 truncate">${esc(n)}</span><span class="font-bold text-purple-700">${q}</span></div>`).join('')
-      : `<p class="text-gray-400 text-sm">No sales yet.</p>`;
+      : `<p class="text-gray-400 text-sm">${I18N.t('a.nosales')}</p>`;
   }
 
   // ===================== SETTINGS ========================================
@@ -531,7 +531,7 @@
     const rows = keys.map((k) => ({ key: k, value: f[k].value.trim(), updated_at: new Date().toISOString() }));
     const { error } = await sb.from('settings').upsert(rows, { onConflict: 'key' });
     if (error) return showToast(error.message, 'error');
-    showToast('Settings saved', 'success');
+    showToast(I18N.t('a.settings_saved'), 'success');
   }
 
   // ===================== TABS ============================================
@@ -552,6 +552,13 @@
     document.getElementById('admin-login-form').addEventListener('submit', login);
     document.getElementById('admin-logout').addEventListener('click', async () => { await sb.auth.signOut(); showLogin(); });
     document.getElementById('shop-toggle').addEventListener('click', toggleShop);
+    document.getElementById('lang-toggle')?.addEventListener('click', () => I18N.toggle());
+    document.addEventListener('lang:changed', () => {
+      if (document.getElementById('dashboard').classList.contains('hidden')) return;
+      renderShopStatus();
+      const active = document.querySelector('[data-tab].active')?.dataset.tab;
+      if (active && LOADERS[active]) LOADERS[active]();
+    });
     document.getElementById('refresh-orders').addEventListener('click', loadOrders);
     document.getElementById('filter-status').addEventListener('change', loadOrders);
     document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => switchTab(b.dataset.tab)));
