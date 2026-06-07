@@ -11,8 +11,8 @@
  * by Row Level Security (RLS) policies defined in the migration.
  */
 window.TRR_CONFIG = {
-  SUPABASE_URL: 'YOUR_SUPABASE_URL',            // e.g. https://abcd1234.supabase.co
-  SUPABASE_ANON_KEY: 'YOUR_SUPABASE_ANON_KEY',  // the long "anon public" JWT
+  SUPABASE_URL: 'https://mpooozwfvnsqyvfenzrt.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wb29vendmdm5zcXl2ZmVuenJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTA0NTcsImV4cCI6MjA5NjM4NjQ1N30.D1Rwqjk6hFC2Pz4b7NxPXhs-LA5ZPz55OzOKIOywY8s',
 
   // Shop defaults (can be overridden by the `settings` table in Supabase)
   SHOP_NAME: 'Taiwan Rice Roll 台湾紫米饭团',
