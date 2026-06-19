@@ -1,11 +1,11 @@
 name: Supabase keep-alive
 
 # Free-tier Supabase projects pause after 7 days of inactivity. This pings the
-# database daily (a tiny anon read) so the project stays active. The anon key is
-# public and safe to commit — all access is guarded by Row Level Security.
+# database every hour (a tiny anon read) so the project stays active. The anon
+# key is public and safe to commit — all access is guarded by Row Level Security.
 on:
   schedule:
-    - cron: '17 6 * * *'   # daily at 06:17 UTC
+    - cron: '17 * * * *'   # every hour, at minute 17
   workflow_dispatch:
 
 jobs:
