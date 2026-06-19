@@ -1,0 +1,22 @@
+name: Supabase keep-alive
+
+# Free-tier Supabase projects pause after 7 days of inactivity. This pings the
+# database daily (a tiny anon read) so the project stays active. The anon key is
+# public and safe to commit — all access is guarded by Row Level Security.
+on:
+  schedule:
+    - cron: '17 6 * * *'   # daily at 06:17 UTC
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query Supabase to register activity
+        run: |
+          ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wb29vendmdm5zcXl2ZmVuenJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTA0NTcsImV4cCI6MjA5NjM4NjQ1N30.D1Rwqjk6hFC2Pz4b7NxPXhs-LA5ZPz55OzOKIOywY8s"
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://mpooozwfvnsqyvfenzrt.supabase.co/rest/v1/products?select=id&limit=1" \
+            -H "apikey: $ANON" -H "Authorization: Bearer $ANON")
+          echo "Supabase responded: $code"
+          test "$code" = "200"
